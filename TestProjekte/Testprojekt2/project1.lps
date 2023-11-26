@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="project1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="23"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="43" Y="11"/>
+        <UsageCount Value="23"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../flexiswitch.pas"/>
+        <UnitName Value="FlexiSwitch"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="134"/>
+        <CursorPos X="50" Y="157"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../outsourced.pas"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="159"/>
+        <CursorPos X="52" Y="179"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../flexiswitch_setter.inc"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="7"/>
+        <CursorPos Y="11"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../../../../Meine_Packages/Multi/Multis/multibutton.pas"/>
+        <UnitName Value="MultiButton"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="421"/>
+        <CursorPos X="110" Y="445"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="10">
+      <Position>
+        <Filename Value="../../flexiswitch.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch.pas"/>
+        <Caret Line="52" Column="65" TopLine="32"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch_setter.inc"/>
+      </Position>
+      <Position>
+        <Filename Value="../../outsourced.pas"/>
+        <Caret Line="14" Column="17"/>
+      </Position>
+      <Position>
+        <Filename Value="../../outsourced.pas"/>
+        <Caret Line="15" Column="21"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch_setter.inc"/>
+        <Caret Line="29" Column="14"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch.pas"/>
+        <Caret Line="237" Column="33" TopLine="213"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch_setter.inc"/>
+        <Caret Line="16" Column="14" TopLine="6"/>
+      </Position>
+      <Position>
+        <Filename Value="../../../../Meine_Packages/Multi/Multis/multibutton.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="../../flexiswitch.pas"/>
+        <Caret Line="42" Column="18" TopLine="23"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

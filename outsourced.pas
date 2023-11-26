@@ -12,6 +12,7 @@ function RotatePoint(const APoint: TPoint; AAngle: Double): TPoint;
 procedure RotateImage(Img: TFPCustomImage; Angle: Double);
 procedure BlendImages(Img1, Img2: TFPCustomImage; AFactor: Double);
 procedure ChangeColor(Img: TLazIntfImage;aColor : TColor);
+procedure ChangeBorderColor(Img: TLazIntfImage;aColor : TColor);
 Procedure StretchDrawImgToImg(SourceImg, DestImg: TLazIntfImage; DestWidth, DestHeight: integer);
 function System_ToRGB(clSys:TColor):TColor;
 
@@ -135,6 +136,64 @@ begin
   Image1.Free;
  end;
 end;
+
+procedure ChangeBorderColor(Img: TLazIntfImage;aColor : TColor);
+var Image1                 : TCustomBitmap;
+    Image2                 : TLazIntfImage;
+    valR,valG,valB,valA    : byte;
+    valRNew,valGNew,valBNew: byte;
+    valtemp1,valtemp2      : byte;
+    x,y                    : integer;
+    P                      : TPoint;
+begin
+ Image1 := TPortableNetworkGraphic.Create;
+ Image1.SetSize(Img.Width,Img.Height);
+ Image2:= Image1.CreateIntfImage;
+ Image2.Assign(Img);
+ {$IFDEF Windows}
+  valtemp1:=0;
+  valtemp2:=200;
+  valRNew:=GetRValue(aColor);
+  valGNew:=getGvalue(aColor);
+  valBNew:=getBvalue(aColor);
+ {$ENDIF}
+ {$IFDEF LINUX}
+  valRNew:=GetBValue(aColor);
+  valGNew:=getGvalue(aColor);
+  valBNew:=getRvalue(aColor);
+  valtemp1:=200;
+  valtemp2:=0;
+ {$ENDIF}
+ try
+
+   for y := 0 to  Img.height - 1 do
+    begin
+     for x := 0 to Img.width - 1 do
+      begin
+       P.X:=x;P.Y:=y;
+       valR:= PRGBQUAD(Img.GetDataLineStart(P.Y))[P.X].rgbRed;
+       valG:= PRGBQuad(Img.GetDataLineStart(P.Y))[P.X].rgbGreen;
+       valB:= PRGBQuad(Img.GetDataLineStart(P.Y))[P.X].rgbBlue;
+       valA:= PRGBQuad(Img.GetDataLineStart(P.Y))[P.X].rgbReserved;
+       if valA <> 0 then
+           begin
+            PRGBQuad(Image2.GetDataLineStart(P.Y))[P.X].rgbRed    := valRNew;
+            PRGBQuad(Image2.GetDataLineStart(P.Y))[P.X].rgbGreen  := valGNew;
+            PRGBQuad(Image2.GetDataLineStart(P.Y))[P.X].rgbBlue   := valBNew;
+            PRGBQuad(Image2.GetDataLineStart(P.Y))[P.X].rgbReserved:=valA;
+           end;
+
+
+      end;//for x
+    end;//for y
+    Img.Assign(Image2);
+
+ finally
+  Image2.Free;
+  Image1.Free;
+ end;
+end;
+
 
 Procedure StretchDrawImgToImg(SourceImg, DestImg: TLazIntfImage; DestWidth, DestHeight: integer);
 Var

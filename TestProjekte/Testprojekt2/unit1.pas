@@ -5,7 +5,7 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, LCLProc, FlexiSwitch;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, FlexiSwitch;
 
 type
 
@@ -13,7 +13,6 @@ type
 
   TForm1 = class(TForm)
     FlexiSwitch1: TFlexiSwitch;
-    procedure FormCreate(Sender: TObject);
   private
 
   public
@@ -26,13 +25,6 @@ var
 implementation
 
 {$R *.lfm}
-
-{ TForm1 }
-
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-
-end;
 
 end.
 

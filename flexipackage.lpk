@@ -9,24 +9,30 @@
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Files>
-      <Item>
+    <Version Build="1"/>
+    <Files Count="3">
+      <Item1>
         <Filename Value="flexiswitch.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="FlexiSwitch"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <Filename Value="flexiswitch_setter.inc"/>
         <Type Value="Include"/>
-      </Item>
+      </Item2>
+      <Item3>
+        <Filename Value="outsourced.pas"/>
+        <UnitName Value="outsourced"/>
+      </Item3>
     </Files>
-    <RequiredPkgs>
-      <Item>
+    <CompatibilityMode Value="True"/>
+    <RequiredPkgs Count="2">
+      <Item1>
         <PackageName Value="LCL"/>
-      </Item>
-      <Item>
+      </Item1>
+      <Item2>
         <PackageName Value="FCL"/>
-      </Item>
+      </Item2>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

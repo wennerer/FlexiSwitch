@@ -20,7 +20,32 @@
    inkscape:export-xdpi="95.955559"
    inkscape:export-ydpi="95.955559">
   <defs
-     id="defs873" />
+     id="defs873">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath875">
+      <g
+         id="use877"
+         inkscape:label="Clip">
+        <g
+           inkscape:label="Clip"
+           id="use879"
+           style="fill:#ffff00">
+          <rect
+             inkscape:export-ydpi="25.400003"
+             inkscape:export-xdpi="25.400003"
+             rx="9.9747925"
+             ry="9.5249996"
+             y="51.731251"
+             x="0.79374999"
+             height="19.049999"
+             width="46.037498"
+             id="rect885"
+             style="fill:#ffff00;fill-opacity:1;stroke-width:0.24993078" />
+        </g>
+      </g>
+    </clipPath>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -30,7 +55,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.3792592"
      inkscape:cx="351.51892"
-     inkscape:cy="-3.5866584"
+     inkscape:cy="-61.588809"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -59,7 +84,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -167,5 +192,23 @@
            style="fill:#71c837;fill-rule:evenodd;stroke:#008000;stroke-width:0.49613601;stroke-opacity:0.964706" />
       </g>
     </g>
+    <path
+       style="fill:#c80000;fill-opacity:1;stroke-width:0.99999994"
+       d="M 49 270 C 27.393999 270 10 287.394 10 309 C 10 330.606 27.393999 348 49 348 L 151 348 C 172.606 348 190 330.606 190 309 C 190 287.394 172.606 270 151 270 L 49 270 z M 50.699219 273 L 149.30078 273 C 170.18658 273 187 289.056 187 309 C 187 328.944 170.18658 345 149.30078 345 L 50.699219 345 C 29.813417 345 13 328.944 13 309 C 13 289.056 29.813417 273 50.699219 273 z "
+       transform="matrix(0.26458333,0,0,0.26458333,0,0.66666669)"
+       id="rect1428-5"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#c80000;fill-opacity:1;stroke-width:0.26458332"
+       id="rect1428-6"
+       width="47.625"
+       height="20.637501"
+       x="82.020828"
+       y="42.999996"
+       ry="10.31875"
+       rx="10.31875"
+       inkscape:export-xdpi="25.400003"
+       inkscape:export-ydpi="25.400003" />
   </g>
 </svg>

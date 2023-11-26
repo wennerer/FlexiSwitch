@@ -6,13 +6,11 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 464
   ClientWidth = 753
+  OnCreate = FormCreate
   object FlexiSwitch1: TFlexiSwitch
-    Left = 117
+    Left = 255
     Height = 78
-    Top = 114
+    Top = 133
     Width = 180
-    InitialBgrdColor = clGreen
-    FinalBgrdColor = clPurple
-    ButtonColor = clYellow
   end
 end

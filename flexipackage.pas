@@ -8,7 +8,7 @@ unit FlexiPackage;
 interface
 
 uses
-  FlexiSwitch, LazarusPackageIntf;
+  FlexiSwitch, outsourced, LazarusPackageIntf;
 
 implementation
 
