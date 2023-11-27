@@ -17,10 +17,13 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-    FCapLeft: integer;
-    FCapTop: integer;
-    fFont: TFont;
+    FDisabledColor: TColor;
+    FEnabledBlendFaktor: Double;
    FImages             : Array[0..1] of TCustomBitmap;
+   FCapLeft            : integer;
+   FCapTop             : integer;
+   FEnabled            : boolean;
+   FFont               : TFont;
    FCaption            : TCaption;
    FDirection          : TDirection;
    FAngel              : Double;
@@ -28,7 +31,7 @@ type
    FFinalCaption       : TCaption;
    FRotation           : Double;
    FSpeed              : integer;
-   FTextStyle: TTextStyle;
+   FTextStyle          : TTextStyle;
    FTimer              : TTimer;
    FBorderColor        : TColor;
    FButtonColor        : TColor;
@@ -55,6 +58,7 @@ type
    procedure SetCapLeft(AValue: integer);
    procedure SetCapTop(AValue: integer);
    procedure SetDirection(AValue: TDirection);
+   procedure SetDisabledColor(AValue: TColor);
    procedure SetFinalBgrdColor(AValue: TColor);
    procedure SetFinalCaption(AValue: TCaption);
    procedure SetFont(AValue: TFont);
@@ -62,7 +66,9 @@ type
    procedure SetInitialBgrdColor(AValue: TColor);
    procedure SetInitialCaption(AValue: TCaption);
    procedure SetLayout(AValue: TTextLayout);
+   procedure SetSpeed(AValue: integer);
    procedure SetTextStyle(AValue: TTextStyle);
+   procedure SetEnabled(aValue: boolean);reintroduce;
 
   protected
    procedure CalculateBounds;
@@ -82,6 +88,12 @@ type
    property Angel : Double read FAngel write FAngel;
    property Rotation : Double read FRotation write FRotation;
    property TextStyle: TTextStyle read FTextStyle write SetTextStyle;
+   //The colour of the control when enable := false
+   //Die Farbe des Controlls wenn enable := false
+   property DisabledColor : TColor read FDisabledColor write SetDisabledColor;
+   //How translucent is the DisabledColor (0=opaque,1=transparent)
+   //Wie transparent die DisabledColor ist (0=undurchsichtig,1=durchsichtig)
+   property EnabledBlendFaktor : Double read FEnabledBlendFaktor write FEnabledBlendFaktor;
   published
    //The initial background colour
    //Die anfängliche Hintergrundfarbe
@@ -106,7 +118,7 @@ type
    property Direction        : TDirection read FDirection write SetDirection default fsLeft;
    //
    //
-   property Speed            : integer read FSpeed write FSpeed default 10;
+   property Speed            : integer read FSpeed write SetSpeed default 10;
    //
    //
    property InitialCaption   : TCaption read FInitialCaption write SetInitialCaption;
@@ -128,6 +140,9 @@ type
    //The vertical distance of the text in the text rectangle (only effective with tlTop)
    //Der vertikale Abstand des Textes im Textrechteck (nur wirksam mit tlTop)
    property CaptionVerMargin : integer read FCapTop write SetCapTop default 0;
+   //Determines whether the control reacts on mouse or keyboard input.
+   //Legt fest, ob das Steuerelement auf Maus- oder Tastatureingaben reagiert.
+   property Enabled : boolean read FEnabled write SetEnabled default true;
   end;
 
 procedure Register;
@@ -147,24 +162,28 @@ constructor TFlexiSwitch.Create(AOwner: TComponent);
 var lv : integer;
 begin
   inherited Create(AOwner);
-  Width      := 60;
-  FOldWidth  := 60;
-  Height     := 26;
-  FOldHeight := 26;
-  FPortion   :=  0;
-  FMargin    :=  3;
-  FRollPos   :=  0;
-  FInitialBgrdColor := rgb(200,0,0);
-  FFinalBgrdColor   := rgb(0,200,0);
-  FButtonColor      := clWhite;
-  FBorderColor      := clNone;
-  FHoverColor       := clNone;
-  FHover            := false;
-  FHoverBlendFaktor := 0.9;
-  FRoll             := true;
-  FAngel            := 0;
-  FRotation         := 30;
-  FDirection        := fsLeft;
+  Width                := 60;
+  FOldWidth            := 60;
+  Height               := 26;
+  FOldHeight           := 26;
+  FPortion             :=  0;
+  FMargin              :=  3;
+  FRollPos             :=  0;
+  FHover               := false;
+  FHoverBlendFaktor    := 0.9;
+  FRoll                := true;
+  FAngel               :=  0;
+  FRotation            := 30;
+  FDirection           := fsLeft;
+  FEnabled             := true;
+  FInitialBgrdColor    := rgb(200,0,0);
+  FFinalBgrdColor      := rgb(0,200,0);
+  FButtonColor         := clWhite;
+  FBorderColor         := clNone;
+  FHoverColor          := clNone;
+  FEnabledBlendFaktor  := 0.6;
+  FDisabledColor       := $D2D2D2;
+
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -210,6 +229,7 @@ end;
 
 procedure TFlexiSwitch.MouseEnter;
 begin
+ if not Enabled then exit;
  inherited MouseEnter;
  FHover := true;
  Invalidate;
@@ -217,6 +237,7 @@ end;
 
 procedure TFlexiSwitch.MouseLeave;
 begin
+ if not Enabled then exit;
  inherited MouseLeave;
  FHover := false;
  Invalidate;
@@ -224,12 +245,14 @@ end;
 
 procedure TFlexiSwitch.MouseMove(Shift: TShiftState; X, Y: Integer);
 begin
-  inherited MouseMove(Shift, X, Y);
+ if not Enabled then exit;
+ inherited MouseMove(Shift, X, Y);
 end;
 
 procedure TFlexiSwitch.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
+ if not Enabled then exit;
  inherited MouseDown(Button, Shift, X, Y);
  FHover := false;
  Invalidate;
@@ -238,6 +261,7 @@ end;
 procedure TFlexiSwitch.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
+ if not Enabled then exit;
  inherited MouseUp(Button, Shift, X, Y);
   if not FTimer.Enabled then
    begin
@@ -344,8 +368,8 @@ begin
 end;
 
 procedure TFlexiSwitch.Paint;
-var BackgroundBmp,ButtonBmp,BorderBmp,HoverBmp,RollBmp : TBitmap;
-    TempImg1,TempImg2,TempImg3        : TLazIntfImage;
+var TmpBmp     : TBitmap;
+    TempImg1,TempImg2,TempImg3 : TLazIntfImage;
     TeRect     : TRect;
 begin
  CalculateBounds;
@@ -356,21 +380,21 @@ begin
    TempImg1 := FBackgroundImage.CreateIntfImage;
    TempImg2 := FBackgroundImage.CreateIntfImage;
    TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   BackgroundBmp  := TBitmap.Create;
+   TmpBmp  := TBitmap.Create;
    try
     ChangeColor(TempImg1,FInitialBgrdColor);
     ChangeColor(TempImg2,FFinalBgrdColor);
     BlendImages(TempImg1,TempImg2,FPortion);
     TempImg3.SetSize(Width,Height);
     StretchDrawImgToImg(TempImg1,TempImg3,width,height);
-    BackgroundBmp.PixelFormat:= pf32Bit;
-    BackgroundBmp.Assign(TempImg3);
-    Canvas.Draw(0,0,BackgroundBmp);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg3);
+    Canvas.Draw(0,0,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
     TempImg3.Free;
-    BackgroundBmp.Free;
+    TmpBmp.Free;
    end;
   end;
 
@@ -379,18 +403,18 @@ begin
   begin
    TempImg1       := FBorderImage.CreateIntfImage;
    TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   BorderBmp      := TBitmap.Create;
+   TmpBmp         := TBitmap.Create;
    try
     ChangeBorderColor(TempImg1,FBorderColor);
     TempImg2.SetSize(Width,Height);
     StretchDrawImgToImg(TempImg1,TempImg2,Width,Height);
-    BorderBmp.PixelFormat:= pf32Bit;
-    BorderBmp.Assign(TempImg2);
-    Canvas.Draw(0,0,BorderBmp);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg2);
+    Canvas.Draw(0,0,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
-    BorderBmp.Free;
+    TmpBmp.Free;
    end;
   end;
 
@@ -400,18 +424,18 @@ begin
   begin
    TempImg1       := FButtonImage.CreateIntfImage;
    TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   ButtonBmp      := TBitmap.Create;
+   TmpBmp      := TBitmap.Create;
    try
     ChangeColor(TempImg1,FButtonColor);
     TempImg2.SetSize(FButtonSize,FButtonSize);
     StretchDrawImgToImg(TempImg1,TempImg2,FButtonSize,FButtonSize);
-    ButtonBmp.PixelFormat:= pf32Bit;
-    ButtonBmp.Assign(TempImg2);
-    Canvas.Draw(FMargin+FRollPos,FMargin,ButtonBmp);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg2);
+    Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
-    ButtonBmp.Free;
+    TmpBmp.Free;
    end;
   end;
 
@@ -419,48 +443,48 @@ begin
  TempImg1 := FImages[0].CreateIntfImage;
  TempImg2 := FImages[1].CreateIntfImage;
  TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
- RollBmp     := TBitmap.Create;
+ TmpBmp   := TBitmap.Create;
  try
   BlendImages(TempImg1,TempImg2,FPortion);
   if FRoll then
    RotateImage(TempImg1,DegToRad(FAngel));
-  RollBmp.Pixelformat := pf32Bit;
+  TmpBmp.Pixelformat := pf32Bit;
   TempImg3.SetSize(FButtonSize,FButtonSize);
   StretchDrawImgToImg(TempImg1,TempImg3,FButtonSize,FButtonSize);
-  RollBmp.Assign(TempImg3);
+  TmpBmp.Assign(TempImg3);
   if (FDirection = fsRight) and not FTimer.Enabled then
    FRollPos := width - (FButtonSize + (2*FMargin));
-  Canvas.Draw(FMargin+FRollPos,FMargin,RollBmp);
+  Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
  finally
   TempImg1.Free;
   TempImg2.Free;
   TempImg3.Free;
-  RollBmp.Free;
+  TmpBmp.Free;
  end;
 
 
  //Draw a hover event
  if FHoverColor <> clNone then
-  if FHover then
+  if FHover and FEnabled then
   begin
    TempImg1       := FBackgroundImage.CreateIntfImage;
    TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TempImg3       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   HoverBmp      := TBitmap.Create;
+   TmpBmp         := TBitmap.Create;
    try
     ChangeColor(TempImg1,FHoverColor);
     TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
     BlendImages(TempImg1,TempImg2,FHoverBlendFaktor);
     TempImg3.SetSize(Width,Height);
     StretchDrawImgToImg(TempImg1,TempImg3,Width,Height);
-    HoverBmp.PixelFormat:= pf32Bit;
-    HoverBmp.Assign(TempImg3);
-    Canvas.Draw(0,0,HoverBmp);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg3);
+    Canvas.Draw(0,0,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
     TempImg3.Free;
-    HoverBmp.Free;
+    TmpBmp.Free;
    end;
   end;
 
@@ -470,6 +494,29 @@ begin
  canvas.TextRect(TeRect,TeRect.Left+FCapLeft,TeRect.Top+FCapTop,
                  FCaption,FTextStyle);
 
+ //Draw not enabled
+ if not Enabled then
+  begin
+   TempImg1       := FBackgroundImage.CreateIntfImage;
+   TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
+   TempImg3       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
+   TmpBmp         := TBitmap.Create;
+   try
+    ChangeColor(TempImg1,FDisabledColor);
+    TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
+    BlendImages(TempImg1,TempImg2,FEnabledBlendFaktor);
+    TempImg3.SetSize(Width,Height);
+    StretchDrawImgToImg(TempImg1,TempImg3,Width,Height);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg3);
+    Canvas.Draw(0,0,TmpBmp);
+   finally
+    TempImg1.Free;
+    TempImg2.Free;
+    TempImg3.Free;
+    TmpBmp.Free;
+   end;
+  end;
 
 
 

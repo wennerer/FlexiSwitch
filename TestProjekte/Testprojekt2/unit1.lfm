@@ -6,21 +6,15 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 291
   ClientWidth = 432
-  object Button1: TButton
-    Left = 232
-    Height = 25
-    Top = 104
-    Width = 75
-    Caption = 'Button1'
-    TabOrder = 0
-  end
   object FlexiSwitch1: TFlexiSwitch
     Left = 104
-    Height = 26
+    Height = 68
     Top = 99
-    Width = 60
-    InitialCaption = ' '
-    FinalCaption = ' '
+    Width = 157
+    HoverColor = clBtnShadow
+    Speed = 20
+    InitialCaption = 'Nein '
+    FinalCaption = 'Ja'
     Font.Color = clWhite
     Font.Style = [fsBold]
   end

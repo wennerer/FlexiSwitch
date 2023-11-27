@@ -72,6 +72,13 @@ begin
   Invalidate;
 end;
 
+procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
+begin
+  if FDisabledColor=AValue then Exit;
+  FDisabledColor:=AValue;
+  Invalidate;
+end;
+
 procedure TFlexiSwitch.SetBorderColor(AValue: TColor);
 begin
   if FBorderColor=AValue then Exit;
@@ -104,9 +111,23 @@ begin
  Invalidate;
 end;
 
+procedure TFlexiSwitch.SetSpeed(AValue: integer);
+begin
+  if FSpeed=AValue then Exit;
+  FSpeed:=AValue;
+  FTimer.Interval := AValue;
+end;
+
 procedure TFlexiSwitch.SetTextStyle(AValue: TTextStyle);
 begin
  FTextStyle:=AValue;
+end;
+
+procedure TFlexiSwitch.SetEnabled(aValue: boolean);
+begin
+ if FEnabled = aValue then Exit;
+ FEnabled:=aValue;
+ Invalidate;
 end;
 
 
