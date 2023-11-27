@@ -17,9 +17,11 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-    FDisabledColor: TColor;
-    FEnabledBlendFaktor: Double;
    FImages             : Array[0..1] of TCustomBitmap;
+   FFinalImage         : TCustomBitmap;
+   FInitialImage       : TCustomBitmap;
+   FDisabledColor      : TColor;
+   FEnabledBlendFaktor : Double;
    FCapLeft            : integer;
    FCapTop             : integer;
    FEnabled            : boolean;
@@ -81,7 +83,7 @@ type
    procedure MouseMove({%H-}Shift: TShiftState; X, Y: Integer);override;
    procedure MouseDown({%H-}Button: TMouseButton;{%H-}Shift: TShiftState; X, Y: Integer);override;
    procedure MouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);override;
-   //procedure LoadImagesfromFile(InitialFilename,FinalFilename: string);
+   procedure LoadImagesfromFile(InitialFilename,FinalFilename: string);
    procedure Paint; override;
 
    property HoverBlendFaktor : Double read FHoverBlendFaktor write FHoverBlendFaktor;
@@ -91,8 +93,8 @@ type
    //The colour of the control when enable := false
    //Die Farbe des Controlls wenn enable := false
    property DisabledColor : TColor read FDisabledColor write SetDisabledColor;
-   //How translucent is the DisabledColor (0=opaque,1=transparent)
-   //Wie transparent die DisabledColor ist (0=undurchsichtig,1=durchsichtig)
+   //How translucent is the DisabledColor (1=opaque,0=transparent)
+   //Wie transparent die DisabledColor ist (1=undurchsichtig,0=durchsichtig)
    property EnabledBlendFaktor : Double read FEnabledBlendFaktor write FEnabledBlendFaktor;
   published
    //The initial background colour
@@ -170,7 +172,7 @@ begin
   FMargin              :=  3;
   FRollPos             :=  0;
   FHover               := false;
-  FHoverBlendFaktor    := 0.9;
+  FHoverBlendFaktor    := 0.3;
   FRoll                := true;
   FAngel               :=  0;
   FRotation            := 30;
@@ -181,8 +183,8 @@ begin
   FButtonColor         := clWhite;
   FBorderColor         := clNone;
   FHoverColor          := clNone;
-  FEnabledBlendFaktor  := 0.6;
-  FDisabledColor       := $D2D2D2;
+  FEnabledBlendFaktor  := 0.7;
+  FDisabledColor       := clWhite;
 
 
   FTimer            := TTimer.Create(nil);
@@ -214,6 +216,10 @@ begin
     FImages[lv] := TPortableNetworkGraphic.Create;
   FImages[0].LoadFromResourceName(HInstance,'off');
   FImages[1].LoadFromResourceName(HInstance,'ok');
+  FInitialImage := TPortableNetworkGraphic.Create;
+  FInitialImage.Assign(FImages[0]);
+  FFinalImage := TPortableNetworkGraphic.Create;
+  FFinalImage.Assign(FImages[1]);
 end;
 
 destructor TFlexiSwitch.Destroy;
@@ -221,6 +227,9 @@ var lv : integer;
 begin
  FBackgroundImage.Free;
  FButtonImage.Free;
+ FBorderImage.Free;
+ FInitialImage.Free;
+ FFinalImage.Free;
  for lv := 0 to High(FImages) do FImages[lv].Free;
  FTimer.Free;
  FFont.Free;
@@ -247,6 +256,8 @@ procedure TFlexiSwitch.MouseMove(Shift: TShiftState; X, Y: Integer);
 begin
  if not Enabled then exit;
  inherited MouseMove(Shift, X, Y);
+ //FHover := true;
+ Invalidate;
 end;
 
 procedure TFlexiSwitch.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
@@ -270,6 +281,53 @@ begin
     FTimer.Enabled:= true;
     //if Assigned(OnClick) then OnClick(self);
    end;
+end;
+
+procedure TFlexiSwitch.LoadImagesfromFile(InitialFilename, FinalFilename: string);
+var oldiniimg, oldfinalimg : TCustomBitmap;
+begin
+ oldiniimg   :=TPortableNetworkGraphic.Create;
+ oldfinalimg :=TPortableNetworkGraphic.Create;
+ try
+  if assigned(FInitialImage) then
+   begin
+    oldiniimg.Assign(FInitialImage);
+    FreeAndNil(FInitialImage);
+   end;
+  if assigned(FFinalImage)   then
+   begin
+    oldfinalimg.Assign(FFinalImage);
+    FreeAndNil(FFinalImage);
+   end;
+ FInitialImage := TPortableNetworkGraphic.Create;
+ FFinalImage   := TPortableNetworkGraphic.Create;
+  try
+   if fileexists(InitialFilename) and fileexists(FinalFilename) then
+    begin
+     FInitialImage.LoadFromFile(InitialFilename);
+     FFinalImage.LoadFromFile(FinalFilename);
+     if (FInitialImage.Width <> FFinalImage.Width) or (FInitialImage.Height <> FFinalImage.Height) then
+      begin
+       FInitialImage.Assign(oldiniimg);
+       FFinalImage.Assign(oldfinalimg);
+       showmessage('The size of the images must be the same!');
+      end;
+    end
+   else
+    begin
+     FInitialImage.Assign(oldiniimg);
+     FFinalImage.Assign(oldfinalimg);
+     showmessage('Incorrect path');
+    end;
+  except
+   showmessage('Wrong Graphicformat, only PNG!');
+  end;
+
+ finally
+  oldiniimg.Free;
+  oldfinalimg.Free;
+ end;
+ Invalidate;
 end;
 
 procedure TFlexiSwitch.CalculateBounds;
@@ -440,50 +498,50 @@ begin
   end;
 
  //Draw the rollbutton
- TempImg1 := FImages[0].CreateIntfImage;
- TempImg2 := FImages[1].CreateIntfImage;
- TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
- TmpBmp   := TBitmap.Create;
- try
-  BlendImages(TempImg1,TempImg2,FPortion);
-  if FRoll then
-   RotateImage(TempImg1,DegToRad(FAngel));
-  TmpBmp.Pixelformat := pf32Bit;
-  TempImg3.SetSize(FButtonSize,FButtonSize);
-  StretchDrawImgToImg(TempImg1,TempImg3,FButtonSize,FButtonSize);
-  TmpBmp.Assign(TempImg3);
-  if (FDirection = fsRight) and not FTimer.Enabled then
-   FRollPos := width - (FButtonSize + (2*FMargin));
-  Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
- finally
-  TempImg1.Free;
-  TempImg2.Free;
-  TempImg3.Free;
-  TmpBmp.Free;
- end;
-
-
- //Draw a hover event
- if FHoverColor <> clNone then
-  if FHover and FEnabled then
+ if assigned(FInitialImage) and assigned(FFinalImage) then
   begin
-   TempImg1       := FBackgroundImage.CreateIntfImage;
-   TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   TempImg3       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   TmpBmp         := TBitmap.Create;
+   TempImg1 := FInitialImage.CreateIntfImage;
+   TempImg2 := FFinalImage.CreateIntfImage;
+   TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
+   TmpBmp   := TBitmap.Create;
    try
-    ChangeColor(TempImg1,FHoverColor);
-    TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
-    BlendImages(TempImg1,TempImg2,FHoverBlendFaktor);
-    TempImg3.SetSize(Width,Height);
-    StretchDrawImgToImg(TempImg1,TempImg3,Width,Height);
-    TmpBmp.PixelFormat:= pf32Bit;
+    BlendImages(TempImg1,TempImg2,FPortion);
+    if FRoll then
+     RotateImage(TempImg1,DegToRad(FAngel));
+    TmpBmp.Pixelformat := pf32Bit;
+    TempImg3.SetSize(FButtonSize,FButtonSize);
+    StretchDrawImgToImg(TempImg1,TempImg3,FButtonSize,FButtonSize);
     TmpBmp.Assign(TempImg3);
-    Canvas.Draw(0,0,TmpBmp);
+    if (FDirection = fsRight) and not FTimer.Enabled then
+     FRollPos := width - (FButtonSize + (2*FMargin));
+    Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
     TempImg3.Free;
+    TmpBmp.Free;
+   end;
+ end;
+
+ //Draw a hover event
+ if FHoverColor <> clNone then
+  if FHover (*and FEnabled*) then
+  begin
+   TempImg1       := FBackgroundImage.CreateIntfImage;
+   TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
+   TmpBmp         := TBitmap.Create;
+   try
+    ChangeColor(TempImg1,FHoverColor);
+    TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
+    AlphaImages(TempImg1,FHoverBlendFaktor);
+    TempImg2.SetSize(Width,Height);
+    StretchDrawImgToImg(TempImg1,TempImg2,Width,Height);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg2);
+    Canvas.Draw(0,0,TmpBmp);
+   finally
+    TempImg1.Free;
+    TempImg2.Free;
     TmpBmp.Free;
    end;
   end;
@@ -499,21 +557,19 @@ begin
   begin
    TempImg1       := FBackgroundImage.CreateIntfImage;
    TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
-   TempImg3       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TmpBmp         := TBitmap.Create;
    try
     ChangeColor(TempImg1,FDisabledColor);
     TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
-    BlendImages(TempImg1,TempImg2,FEnabledBlendFaktor);
-    TempImg3.SetSize(Width,Height);
-    StretchDrawImgToImg(TempImg1,TempImg3,Width,Height);
+    AlphaImages(TempImg1,FEnabledBlendFaktor);
+    TempImg2.SetSize(Width,Height);
+    StretchDrawImgToImg(TempImg1,TempImg2,Width,Height);
     TmpBmp.PixelFormat:= pf32Bit;
-    TmpBmp.Assign(TempImg3);
+    TmpBmp.Assign(TempImg2);
     Canvas.Draw(0,0,TmpBmp);
    finally
     TempImg1.Free;
     TempImg2.Free;
-    TempImg3.Free;
     TmpBmp.Free;
    end;
   end;

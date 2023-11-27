@@ -11,6 +11,7 @@ uses
 function RotatePoint(const APoint: TPoint; AAngle: Double): TPoint;
 procedure RotateImage(Img: TFPCustomImage; Angle: Double);
 procedure BlendImages(Img1, Img2: TFPCustomImage; AFactor: Double);
+procedure AlphaImages(Img1: TFPCustomImage; AFactor: Double);
 procedure ChangeColor(Img: TLazIntfImage;aColor : TColor);
 procedure ChangeBorderColor(Img: TLazIntfImage;aColor : TColor);
 Procedure StretchDrawImgToImg(SourceImg, DestImg: TLazIntfImage; DestWidth, DestHeight: integer);
@@ -66,6 +67,24 @@ begin
       g := round(f1 * Img1.Colors[x, y].Green + f2 * Img2.Colors[x, y].Green);
       b := round(f1 * Img1.Colors[x, y].Blue  + f2 * Img2.Colors[x, y].Blue);
       a := round(f1 * Img1.Colors[x, y].Alpha + f2 * Img2.Colors[x, y].Alpha);
+      Img1.Colors[x, y] := FPColor(r, g, b, a);
+    end;
+end;
+
+procedure AlphaImages(Img1: TFPCustomImage; AFactor: Double);
+var
+  x, y: Integer;
+  r,g,b,a: Word;
+  f1: Double;
+begin
+ f1 := AFactor;
+ for y := 0 to Img1.Height-1 do
+    for x := 0 to Img1.Width-1 do
+    begin
+      r := round(f1 * Img1.Colors[x, y].Red   );
+      g := round(f1 * Img1.Colors[x, y].Green );
+      b := round(f1 * Img1.Colors[x, y].Blue  );
+      a := round(f1 * Img1.Colors[x, y].Alpha );
       Img1.Colors[x, y] := FPColor(r, g, b, a);
     end;
 end;
