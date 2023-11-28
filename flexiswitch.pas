@@ -39,10 +39,12 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-    FBestTextHeight: boolean;
    FImages             : Array[0..1] of TCustomBitmap;
    FFinalImage         : TCustomBitmap;
    FInitialImage       : TCustomBitmap;
+   FFocusColor         : TColor;
+   FBestTextHeight     : boolean;
+   FFocusedBlendFaktor : Double;
    FDisabledColor      : TColor;
    FEnabledBlendFaktor : Double;
    FCapLeft            : integer;
@@ -99,6 +101,7 @@ type
    procedure SetDisabledColor(AValue: TColor);
    procedure SetFinalBgrdColor(AValue: TColor);
    procedure SetFinalCaption(AValue: TCaption);
+   procedure SetFocusColor(AValue: TColor);
    procedure SetFont(AValue: TFont);
    procedure SetHoverColor(AValue: TColor);
    procedure SetInitialBgrdColor(AValue: TColor);
@@ -129,6 +132,7 @@ type
    procedure Paint; override;
 
    property HoverBlendFaktor : Double read FHoverBlendFaktor write FHoverBlendFaktor;
+   property FocusedBlendFaktor : Double read FFocusedBlendFaktor write FFocusedBlendFaktor;
    property Angel : Double read FAngel write FAngel;
    property Rotation : Double read FRotation write FRotation;
    property TextStyle: TTextStyle read FTextStyle write SetTextStyle;
@@ -138,6 +142,7 @@ type
    //How translucent is the DisabledColor (1=opaque,0=transparent)
    //Wie transparent die DisabledColor ist (1=undurchsichtig,0=durchsichtig)
    property EnabledBlendFaktor : Double read FEnabledBlendFaktor write FEnabledBlendFaktor;
+
   published
    //The initial background colour
    //Die anfängliche Hintergrundfarbe
@@ -154,6 +159,9 @@ type
    //The color of a hoverevent (clNone = no hover)
    //Die Farbe eines Hoverereignisses (clNone = kein Hover)
    property HoverColor : TColor read FHoverColor write SetHoverColor default clNone;
+   //The color when the Control has the focus
+   //Die Farbe wenn das Control den Fokus hat
+   property FocusColor : TColor read FFocusColor write SetFocusColor default clRed;
    //
    //
    property Roll : boolean read FRoll write FRoll default true;
@@ -250,7 +258,7 @@ begin
   FMargin              :=  3;
   FRollPos             :=  0;
   FHover               := false;
-  FHoverBlendFaktor    := 0.3;
+  FHoverBlendFaktor    := 0.2;
   FRoll                := true;
   FAngel               :=  0;
   FRotation            := 30;
@@ -262,7 +270,9 @@ begin
   FBorderColor         := clNone;
   FHoverColor          := clNone;
   FEnabledBlendFaktor  := 0.7;
+  FFocusedBlendFaktor  := 0.1;
   FDisabledColor       := clWhite;
+  FFocusColor          := clRed;
   FBestTextHeight      := true;
   TabStop              := true;
 
@@ -617,6 +627,30 @@ begin
    end;
   end;
 
+ //Draw focused
+ if Focused then
+  if FEnabled then
+  begin
+   TempImg1       := FBackgroundImage.CreateIntfImage;
+   TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
+   TmpBmp         := TBitmap.Create;
+   try
+    ChangeColor(TempImg1,FFocusColor);
+    TempImg2.SetSize(TempImg1.Width,TempImg1.Height);
+    AlphaImages(TempImg1,FFocusedBlendFaktor);
+    TempImg2.SetSize(Width,Height);
+    StretchDrawImgToImg(TempImg1,TempImg2,Width,Height);
+    TmpBmp.PixelFormat:= pf32Bit;
+    TmpBmp.Assign(TempImg2);
+    Canvas.Draw(0,0,TmpBmp);
+   finally
+    TempImg1.Free;
+    TempImg2.Free;
+    TmpBmp.Free;
+   end;
+  end;
+
+
  CalculateButton;
  //Draw the button
  if FButtonColor <> clNone then
@@ -664,6 +698,13 @@ begin
    end;
  end;
 
+ //Draw the caption
+ TeRect := CalculateTextRect;
+ if FBestTextHeight then FFont.Height := TeRect.Height - round(TeRect.Height * 0.35);
+ Canvas.Font.Assign(FFont);
+ canvas.TextRect(TeRect,TeRect.Left+FCapLeft,TeRect.Top+FCapTop,
+                 FCaption,FTextStyle);
+
  //Draw a hover event
  if FHoverColor <> clNone then
   if FHover and FEnabled then
@@ -687,12 +728,7 @@ begin
    end;
   end;
 
- //Draw the caption
- TeRect := CalculateTextRect;
- if FBestTextHeight then FFont.Height := TeRect.Height - round(TeRect.Height * 0.35);
- Canvas.Font.Assign(FFont);
- canvas.TextRect(TeRect,TeRect.Left+FCapLeft,TeRect.Top+FCapTop,
-                 FCaption,FTextStyle);
+
 
  //Draw not enabled
  if not Enabled then

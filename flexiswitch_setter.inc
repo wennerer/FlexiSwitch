@@ -19,6 +19,13 @@ begin
  Invalidate;
 end;
 
+procedure TFlexiSwitch.SetFocusColor(AValue: TColor);
+begin
+  if FFocusColor=AValue then Exit;
+  FFocusColor:=AValue;
+  Invalidate;
+end;
+
 procedure TFlexiSwitch.SetFont(AValue: TFont);
 begin
  if fFont=AValue then Exit;

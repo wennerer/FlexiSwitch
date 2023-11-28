@@ -17,14 +17,14 @@ object Form1: TForm1
   end
   object FlexiSwitch1: TFlexiSwitch
     Left = 138
-    Height = 58
+    Height = 46
     Top = 96
-    Width = 134
+    Width = 106
     HoverColor = clPurple
     InitialCaption = 'OFF'
     FinalCaption = 'ON'
     Font.Color = clWhite
-    Font.Height = 32
+    Font.Height = 25
     Font.Style = [fsBold]
     TabOrder = 0
   end
