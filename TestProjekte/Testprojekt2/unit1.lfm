@@ -17,9 +17,9 @@ object Form1: TForm1
   end
   object FlexiSwitch1: TFlexiSwitch
     Left = 84
-    Height = 32
+    Height = 68
     Top = 84
-    Width = 74
+    Width = 157
     HoverColor = clMoneyGreen
     InitialCaption = 'OFF'
     FinalCaption = 'ON'
