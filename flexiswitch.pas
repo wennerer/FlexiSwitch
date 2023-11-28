@@ -6,10 +6,32 @@ interface
 
 uses
   Classes, SysUtils, Math, LResources, Forms, Controls, Graphics, Dialogs,
-  IntfGraphics, LCLIntf, LCLProc, GraphType, outsourced, ExtCtrls;
+  IntfGraphics, LCLIntf, LCLProc, GraphType, outsourced, ExtCtrls, LMessages,
+  LCLType;
+
+type
+  TClickEvent = procedure(Sender: TObject) of object;
+type
+  TMouseMoveEvent = procedure(Sender: TObject;Shift: TShiftState;
+                              X,Y: Integer) of Object;
+type
+  TMouseEvent = procedure(Sender: TObject; Button: TMouseButton;
+                          Shift: TShiftState; X, Y: Integer) of Object;
+type
+  TMouseEnterLeave = procedure(Sender: TObject) of object;
+type
+  TNotifyEvent = procedure(Sender: TObject) of object;
+type
+  TKeyEvent = procedure(Sender: TObject; var Key: Word; Shift: TShiftState) of Object;
+type
+  TKeyPressEvent = procedure(Sender: TObject; var Key: char) of Object;
+type
+  TChangeEvent = procedure(Sender: TObject) of object;
+
 
 type
   TDirection = (fsRight,fsLeft);
+
 
 type
 
@@ -32,6 +54,18 @@ type
    FAngel              : Double;
    FInitialCaption     : TCaption;
    FFinalCaption       : TCaption;
+   FOnChange           : TChangeEvent;
+   FOnClick            : TClickEvent;
+   FOnEnter            : TNotifyEvent;
+   FOnExit             : TNotifyEvent;
+   FOnKeyDown          : TKeyEvent;
+   FOnKeyPress         : TKeyPressEvent;
+   FOnKeyUp            : TKeyEvent;
+   FOnMouseDown        : TMouseEvent;
+   FOnMouseEnter       : TMouseEnterLeave;
+   FOnMouseLeave       : TMouseEnterLeave;
+   FOnMouseMove        : TMouseMoveEvent;
+   FOnMouseUp          : TMouseEvent;
    FRotation           : Double;
    FSpeed              : integer;
    FTextStyle          : TTextStyle;
@@ -77,6 +111,12 @@ type
   protected
    procedure CalculateBounds;
    procedure CalculateButton;
+   procedure KeyPress(var Key: char);override;
+   procedure KeyDown(var Key: Word; Shift: TShiftState);  override;
+   procedure KeyUp(var Key: Word; Shift: TShiftState);  override;
+   procedure CNKeyDown    (var Message: TLMKeyDown);    message CN_KEYDOWN;
+   procedure DoExit;  override;
+   procedure DoEnter; override;
   public
    constructor Create(AOwner: TComponent); override;
    destructor  Destroy; override;
@@ -150,6 +190,39 @@ type
    //
    //
    property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
+
+   property TabStop default TRUE;
+   property PopupMenu;
+   property DragMode;
+   property DragKind;
+   property DragCursor;
+   property Align;
+   property Anchors;
+   property Action;
+   property BidiMode;
+   property BorderSpacing;
+   property Constraints;
+   property HelpType;
+   property TabOrder;
+
+   property OnClick      : TClickEvent read FOnClick     write FOnClick;
+   property OnMouseMove  : TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+   property OnMouseDown  : TMouseEvent read FOnMouseDown write FOnMouseDown;
+   property OnMouseUp    : TMouseEvent read FOnMouseUp write FOnMouseUp;
+   property OnMouseEnter : TMouseEnterLeave read FOnMouseEnter write FOnMouseEnter;
+   property OnMouseLeave : TMouseEnterLeave read FOnMouseLeave write FOnMouseLeave;
+   property OnEnter      : TNotifyEvent read FOnEnter write FOnEnter;
+   property OnExit       : TNotifyEvent read FOnExit write FOnExit;
+   property OnKeyPress   : TKeyPressEvent read FOnKeyPress write FOnKeyPress;
+   property OnKeyDown    : TKeyEvent read FOnKeyDown write FOnKeyDown;
+   property OnKeyUp      : TKeyEvent read FOnKeyUp write FOnKeyUp;
+   property OnChange     : TChangeEvent read FOnChange write FOnChange;
+   property OnDragDrop;
+   property OnDragOver;
+   property OnEndDrag;
+   property OnStartDrag;
+
+
   end;
 
 procedure Register;
@@ -191,6 +264,7 @@ begin
   FEnabledBlendFaktor  := 0.7;
   FDisabledColor       := clWhite;
   FBestTextHeight      := true;
+  TabStop              := true;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -246,6 +320,7 @@ begin
  if not Enabled then exit;
  inherited MouseEnter;
  FHover := true;
+ if Assigned(OnMouseEnter) then OnMouseEnter(self);
  Invalidate;
 end;
 
@@ -254,6 +329,7 @@ begin
  if not Enabled then exit;
  inherited MouseLeave;
  FHover := false;
+ if Assigned(OnMouseLeave) then OnMouseLeave(self);
  Invalidate;
 end;
 
@@ -261,6 +337,7 @@ procedure TFlexiSwitch.MouseMove(Shift: TShiftState; X, Y: Integer);
 begin
  if not Enabled then exit;
  inherited MouseMove(Shift, X, Y);
+ if Assigned(OnMouseMove) then OnMouseMove(self,Shift,x,y);
  //FHover := true;
  Invalidate;
 end;
@@ -271,6 +348,7 @@ begin
  if not Enabled then exit;
  inherited MouseDown(Button, Shift, X, Y);
  FHover := false;
+ if Assigned(OnMouseDown) then OnMouseDown(self,Button,Shift,x,y);
  Invalidate;
 end;
 
@@ -279,12 +357,14 @@ procedure TFlexiSwitch.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
 begin
  if not Enabled then exit;
  inherited MouseUp(Button, Shift, X, Y);
+ if Assigned(OnMouseUp) then OnMouseUp(self,Button,Shift,x,y);
+ if Assigned(OnClick) then OnClick(self);
   if not FTimer.Enabled then
    begin
     //if FDirection = fsRight then FDirection := fsLeft else FDirection := fsRight;
     FDirection := TDirection((ord(FDirection) + 1) mod 2);
     FTimer.Enabled:= true;
-    //if Assigned(OnClick) then OnClick(self);
+    if Assigned(OnChange) then OnChange(self);
    end;
 end;
 
@@ -372,6 +452,62 @@ begin
  FMargin      := round((Height / 100) * Factor);
 
  FButtonSize := Height - (2 * FMargin);
+end;
+
+procedure TFlexiSwitch.KeyPress(var Key: char);
+begin
+  inherited KeyPress(Key);
+  if Assigned(OnKeyPress) then OnKeyPress(self,Key);
+end;
+
+procedure TFlexiSwitch.KeyDown(var Key: Word; Shift: TShiftState);
+begin
+  inherited KeyDown(Key, Shift);
+  if Assigned(OnKeyDown) then OnKeyDown(self,Key,Shift);
+end;
+
+procedure TFlexiSwitch.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited KeyUp(Key, Shift);
+  if Assigned(OnKeyUp) then OnKeyUp(self,Key,Shift);
+end;
+
+procedure TFlexiSwitch.CNKeyDown(var Message: TLMKeyDown);
+begin
+ with Message do begin
+    Result := 1;
+    case CharCode of
+        VK_RETURN  : begin
+                      if not FEnabled then exit;
+                       if not FTimer.Enabled then
+                        begin
+                         FDirection := TDirection((ord(FDirection) + 1) mod 2);
+                         FTimer.Enabled:= true;
+                         if Assigned(OnChange) then OnChange(self);
+                        end;
+                      Invalidate;
+                      //if FGroupIndex <> 0 then CheckTheGroup;
+                     end
+
+      else begin
+        Result := 0;
+      end;
+    end;
+  end;
+
+  inherited;
+end;
+
+procedure TFlexiSwitch.DoExit;
+begin
+  inherited DoExit;
+  if Assigned(OnExit) then OnExit(self);
+end;
+
+procedure TFlexiSwitch.DoEnter;
+begin
+ inherited DoEnter;
+ if Assigned(OnEnter) then OnEnter(self);
 end;
 
 

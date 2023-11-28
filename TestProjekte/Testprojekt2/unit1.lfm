@@ -13,19 +13,19 @@ object Form1: TForm1
     Width = 75
     Caption = 'Button1'
     OnClick = Button1Click
-    TabOrder = 0
+    TabOrder = 1
   end
   object FlexiSwitch1: TFlexiSwitch
-    Left = 84
-    Height = 78
-    Top = 84
-    Width = 180
-    FinalBgrdColor = clWhite
-    HoverColor = clMoneyGreen
-    InitialCaption = 'Nein'
-    FinalCaption = 'Ja'
+    Left = 138
+    Height = 58
+    Top = 96
+    Width = 134
+    HoverColor = clPurple
+    InitialCaption = 'OFF'
+    FinalCaption = 'ON'
     Font.Color = clWhite
-    Font.Height = 43
+    Font.Height = 32
     Font.Style = [fsBold]
+    TabOrder = 0
   end
 end
