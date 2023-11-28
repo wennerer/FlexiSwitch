@@ -17,6 +17,7 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
+    FBestTextHeight: boolean;
    FImages             : Array[0..1] of TCustomBitmap;
    FFinalImage         : TCustomBitmap;
    FInitialImage       : TCustomBitmap;
@@ -55,6 +56,7 @@ type
    procedure FTimerTimer(Sender: TObject);
    function CalculateTextRect:TRect;
    procedure SetAlignment(AValue: TAlignment);
+   procedure SetBestTextHeight(AValue: boolean);
    procedure SetBorderColor(AValue: TColor);
    procedure SetButtonColor(AValue: TColor);
    procedure SetCapLeft(AValue: integer);
@@ -145,6 +147,9 @@ type
    //Determines whether the control reacts on mouse or keyboard input.
    //Legt fest, ob das Steuerelement auf Maus- oder Tastatureingaben reagiert.
    property Enabled : boolean read FEnabled write SetEnabled default true;
+   //
+   //
+   property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
   end;
 
 procedure Register;
@@ -185,7 +190,7 @@ begin
   FHoverColor          := clNone;
   FEnabledBlendFaktor  := 0.7;
   FDisabledColor       := clWhite;
-
+  FBestTextHeight      := true;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -412,13 +417,13 @@ function TFlexiSwitch.CalculateTextRect: TRect;
 begin
   if FDirection = fsLeft then
   begin
-   Result.Left   := 2*FMargin + FButtonSize;
+   Result.Left   := FMargin + FButtonSize;
    Result.Top    := FMargin;
    Result.Right  := Width - FMargin;
    Result.Bottom := Height - FMargin;
   end else
   begin
-   Result.Left   := 2*FMargin;
+   Result.Left   := FMargin;
    Result.Top    := FMargin;
    Result.Right  := Width - (FMargin+ FButtonSize);
    Result.Bottom := Height - FMargin;
@@ -525,7 +530,7 @@ begin
 
  //Draw a hover event
  if FHoverColor <> clNone then
-  if FHover (*and FEnabled*) then
+  if FHover and FEnabled then
   begin
    TempImg1       := FBackgroundImage.CreateIntfImage;
    TempImg2       := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
@@ -547,8 +552,9 @@ begin
   end;
 
  //Draw the caption
- Canvas.Font.Assign(FFont);
  TeRect := CalculateTextRect;
+ if FBestTextHeight then FFont.Height := TeRect.Height - round(TeRect.Height * 0.35);
+ Canvas.Font.Assign(FFont);
  canvas.TextRect(TeRect,TeRect.Left+FCapLeft,TeRect.Top+FCapTop,
                  FCaption,FTextStyle);
 

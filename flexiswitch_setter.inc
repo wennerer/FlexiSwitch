@@ -5,6 +5,7 @@
 procedure TFlexiSwitch.SetFinalBgrdColor(AValue: TColor);
 begin
   if FFinalBgrdColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FFinalBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -28,6 +29,7 @@ end;
 procedure TFlexiSwitch.SetHoverColor(AValue: TColor);
 begin
   if FHoverColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FHoverColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -35,6 +37,7 @@ end;
 procedure TFlexiSwitch.SetButtonColor(AValue: TColor);
 begin
   if FButtonColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FButtonColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -75,6 +78,7 @@ end;
 procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
 begin
   if FDisabledColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FDisabledColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -82,6 +86,7 @@ end;
 procedure TFlexiSwitch.SetBorderColor(AValue: TColor);
 begin
   if FBorderColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FBorderColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -89,6 +94,7 @@ end;
 procedure TFlexiSwitch.SetInitialBgrdColor(AValue: TColor);
 begin
   if FInitialBgrdColor=AValue then Exit;
+  if aValue = clNone then FBorderColor:= clNone else
   FInitialBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -107,7 +113,6 @@ begin
  if fTextStyle.Layout=AValue then exit;
  fTextStyle.Layout:=AValue;
  if aValue <> tlTop then FCapTop:=0;
- //if FAutoSize then TriggerAutoSize;
  Invalidate;
 end;
 
@@ -136,7 +141,13 @@ begin
  if fTextStyle.Alignment=AValue then exit;
  fTextStyle.Alignment:=AValue;
  if aValue <> taLeftJustify then FCapLeft:=0;
- //if FAutoSize then TriggerAutoSize;
  Invalidate;
+end;
+
+procedure TFlexiSwitch.SetBestTextHeight(AValue: boolean);
+begin
+  if FBestTextHeight=AValue then Exit;
+  FBestTextHeight:=AValue;
+  Invalidate;
 end;
 
