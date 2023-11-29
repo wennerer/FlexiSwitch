@@ -5,7 +5,7 @@
 procedure TFlexiSwitch.SetFinalBgrdColor(AValue: TColor);
 begin
   if FFinalBgrdColor=AValue then Exit;
-  if aValue = clNone then FBorderColor:= clNone else
+  if aValue = clNone then FFinalBgrdColor:= clNone else
   FFinalBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -22,7 +22,8 @@ end;
 procedure TFlexiSwitch.SetFocusColor(AValue: TColor);
 begin
   if FFocusColor=AValue then Exit;
-  FFocusColor:=AValue;
+  if aValue = clNone then FFocusColor:= clNone else
+  FFocusColor:=System_ToRGB(AValue);
   Invalidate;
 end;
 
@@ -36,7 +37,7 @@ end;
 procedure TFlexiSwitch.SetHoverColor(AValue: TColor);
 begin
   if FHoverColor=AValue then Exit;
-  if aValue = clNone then FBorderColor:= clNone else
+  if aValue = clNone then FHoverColor:= clNone else
   FHoverColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -44,7 +45,7 @@ end;
 procedure TFlexiSwitch.SetButtonColor(AValue: TColor);
 begin
   if FButtonColor=AValue then Exit;
-  if aValue = clNone then FBorderColor:= clNone else
+  if aValue = clNone then FButtonColor:= clNone else
   FButtonColor:=System_ToRGB(AValue);
   Invalidate;
 end;
@@ -85,10 +86,11 @@ end;
 procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
 begin
   if FDisabledColor=AValue then Exit;
-  if aValue = clNone then FBorderColor:= clNone else
+  if aValue = clNone then FDisabledColor:= clNone else
   FDisabledColor:=System_ToRGB(AValue);
   Invalidate;
 end;
+
 
 procedure TFlexiSwitch.SetBorderColor(AValue: TColor);
 begin
@@ -101,7 +103,7 @@ end;
 procedure TFlexiSwitch.SetInitialBgrdColor(AValue: TColor);
 begin
   if FInitialBgrdColor=AValue then Exit;
-  if aValue = clNone then FBorderColor:= clNone else
+  if aValue = clNone then FInitialBgrdColor:= clNone else
   FInitialBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;

@@ -89,6 +89,14 @@ type
    FBackgroundImage    : TCustomBitmap;
    FButtonImage        : TCustomBitmap;
    FBorderImage        : TCustomBitmap;
+   procedure DrawAHoverEvent;
+   procedure DrawFocused;
+   procedure DrawNotEnabled;
+   procedure DrawTheBackground;
+   procedure DrawTheBorder;
+   procedure DrawTheButton;
+   procedure DrawTheCaption;
+   procedure DrawTheRollbutton;
    procedure FTimerTimer(Sender: TObject);
    function CalculateTextRect:TRect;
    procedure SetAlignment(AValue: TAlignment);
@@ -152,7 +160,7 @@ type
    property FinalBgrdColor : TColor read FFinalBgrdColor write SetFinalBgrdColor default $0000C800;
    //The color of the button
    //Die Farbe des Buttons
-   property ButtonColor : TColor read FButtonColor write SetButtonColor default clWhite;
+   property ButtonColor : TColor read FButtonColor write SetButtonColor default clNone;
    //The color of the border (clNone = no Border)
    //Farbe des Randes (clNone = keinRand)
    property BorderColor : TColor read FBorderColor write SetBorderColor default clNone;
@@ -162,20 +170,20 @@ type
    //The color when the Control has the focus
    //Die Farbe wenn das Control den Fokus hat
    property FocusColor : TColor read FFocusColor write SetFocusColor default clRed;
-   //
-   //
+   //Determines whether the RollButton(Image) rotates
+   //Bestimmt ob sich der RollButton(Image) dreht
    property Roll : boolean read FRoll write FRoll default true;
-   //
-   //
+   //Specifies whether the button is on the right or left at the start
+   //Gibt an ob der Button beim Start rechts oder links ist
    property Direction        : TDirection read FDirection write SetDirection default fsLeft;
-   //
-   //
+   //The speed at which the button moves
+   //Die Geschwindigkeit mit der sich der Button bewegt
    property Speed            : integer read FSpeed write SetSpeed default 10;
-   //
-   //
+   //The caption that is displayed when the button is on the left
+   //Die Caption die angezeigt wird wenn der Button links ist
    property InitialCaption   : TCaption read FInitialCaption write SetInitialCaption;
-   //
-   //
+   //The caption that is displayed when the button is on the right
+   //Die Caption die angezeigt wird wenn der Button rechts ist
    property FinalCaption     : TCaption read FFinalCaption  write SetFinalCaption;
    //The font to be used for text display in this switch.
    //Die Schrift die für die Textanzeige in diesem Schalter verwendet werden soll.
@@ -195,9 +203,10 @@ type
    //Determines whether the control reacts on mouse or keyboard input.
    //Legt fest, ob das Steuerelement auf Maus- oder Tastatureingaben reagiert.
    property Enabled : boolean read FEnabled write SetEnabled default true;
-   //
-   //
+   //Automatically adjusts the text height to the size of the control
+   //Passt die Texthöhe automatisch der Größe des Controlls an
    property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
+
 
    property TabStop default TRUE;
    property PopupMenu;
@@ -212,6 +221,7 @@ type
    property Constraints;
    property HelpType;
    property TabOrder;
+   property Visible;
 
    property OnClick      : TClickEvent read FOnClick     write FOnClick;
    property OnMouseMove  : TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
@@ -266,7 +276,7 @@ begin
   FEnabled             := true;
   FInitialBgrdColor    := rgb(200,0,0);
   FFinalBgrdColor      := rgb(0,200,0);
-  FButtonColor         := clWhite;
+  FButtonColor         := clNone;
   FBorderColor         := clNone;
   FHoverColor          := clNone;
   FEnabledBlendFaktor  := 0.7;
@@ -576,14 +586,10 @@ begin
   end;
 end;
 
-procedure TFlexiSwitch.Paint;
-var TmpBmp     : TBitmap;
+procedure TFlexiSwitch.DrawTheBackground;
+var TmpBmp                     : TBitmap;
     TempImg1,TempImg2,TempImg3 : TLazIntfImage;
-    TeRect     : TRect;
 begin
- CalculateBounds;
-
- //Draw the background
  if (FInitialBgrdColor <> clNone) and (FFinalBgrdColor <> clNone) then
   begin
    TempImg1 := FBackgroundImage.CreateIntfImage;
@@ -606,8 +612,12 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
- //Draw the border
+procedure TFlexiSwitch.DrawTheBorder;
+var TmpBmp            : TBitmap;
+    TempImg1,TempImg2 : TLazIntfImage;
+begin
  if FBorderColor <> clNone then
   begin
    TempImg1       := FBorderImage.CreateIntfImage;
@@ -626,8 +636,12 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
- //Draw focused
+procedure TFlexiSwitch.DrawFocused;
+var TmpBmp            : TBitmap;
+    TempImg1,TempImg2 : TLazIntfImage;
+begin
  if Focused then
   if FEnabled then
   begin
@@ -649,10 +663,12 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
-
- CalculateButton;
- //Draw the button
+procedure TFlexiSwitch.DrawTheButton;
+var TmpBmp            : TBitmap;
+    TempImg1,TempImg2 : TLazIntfImage;
+begin
  if FButtonColor <> clNone then
   begin
    TempImg1       := FButtonImage.CreateIntfImage;
@@ -671,8 +687,13 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
- //Draw the rollbutton
+procedure TFlexiSwitch.DrawTheRollbutton;
+var TmpBmp                     : TBitmap;
+    TempImg1,TempImg2,TempImg3 : TLazIntfImage;
+begin
+ if FButtonColor = clNone then
  if assigned(FInitialImage) and assigned(FFinalImage) then
   begin
    TempImg1 := FInitialImage.CreateIntfImage;
@@ -697,15 +718,22 @@ begin
     TmpBmp.Free;
    end;
  end;
+end;
 
- //Draw the caption
+procedure TFlexiSwitch.DrawTheCaption;
+var TeRect     : TRect;
+begin
  TeRect := CalculateTextRect;
  if FBestTextHeight then FFont.Height := TeRect.Height - round(TeRect.Height * 0.35);
  Canvas.Font.Assign(FFont);
  canvas.TextRect(TeRect,TeRect.Left+FCapLeft,TeRect.Top+FCapTop,
                  FCaption,FTextStyle);
+end;
 
- //Draw a hover event
+procedure TFlexiSwitch.DrawAHoverEvent;
+var TmpBmp            : TBitmap;
+    TempImg1,TempImg2 : TLazIntfImage;
+begin
  if FHoverColor <> clNone then
   if FHover and FEnabled then
   begin
@@ -727,10 +755,12 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
-
-
- //Draw not enabled
+procedure TFlexiSwitch.DrawNotEnabled;
+var TmpBmp            : TBitmap;
+    TempImg1,TempImg2 : TLazIntfImage;
+begin
  if not Enabled then
   begin
    TempImg1       := FBackgroundImage.CreateIntfImage;
@@ -751,8 +781,29 @@ begin
     TmpBmp.Free;
    end;
   end;
+end;
 
+procedure TFlexiSwitch.Paint;
+begin
+ CalculateBounds;
 
+ DrawTheBackground;
+
+ DrawTheBorder;
+
+ DrawFocused;
+
+ CalculateButton;
+
+ DrawTheButton;
+
+ DrawTheRollbutton;
+
+ DrawTheCaption;
+
+ DrawAHoverEvent;
+
+ DrawNotEnabled;
 
 end;
 

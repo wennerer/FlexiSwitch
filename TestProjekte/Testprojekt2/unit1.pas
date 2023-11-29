@@ -32,7 +32,7 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
- FlexiSwitch1.LoadImagesfromFile('Lock.png','Unlock.png');
+ FlexiSwitch1.LoadImagesfromFile('ok_1.png','ok.png');
 end;
 
 end.
