@@ -15,6 +15,7 @@ begin
   PEForm.BorderStyle    := bsSingle;
   PEForm.Caption        := 'Select a image for a RollButton';
 
+  FFirst := true;
   FHigh := TFlexiSwitch(GetComponent(0)).FImagesCount;
   for lv := 0 to FHigh do
     FImages[lv] := TPortableNetworkGraphic.Create;
@@ -55,8 +56,10 @@ begin
     FRadioButton[lv].OnClick:=@RadioButtons;
    end;
   FRadioButton[0].Caption := 'LeftRollImage [Left]';
-  FRadioButton[0].Checked := true;
   FRadioButton[1].Caption := 'RightRollImage [Right]';
+  if FRollImage.aDirection = fsLeft then FRadioButton[0].Checked := true
+  else FRadioButton[1].Checked := true;
+
 
   for lv := 0 to 1 do
    begin
@@ -70,6 +73,7 @@ begin
    end;
   FButton[0].Caption := 'Apply';
   FButton[1].Caption := 'Close';
+
 
    PEForm.ShowModal;
 
@@ -99,17 +103,21 @@ begin
   end;
  if Sender = FButton[0] then  //Apply
   begin
-   if FRadioButton[0].Checked then FRollImage.aDirection := fsLeft
-   else FRollImage.aDirection := fsRight;
    SetPtrValue(FRollImage);
   end;
 end;
 
 procedure TPropertyImageSelector.RadioButtons(Sender: TObject);
 begin
+ if FFirst then
+  begin
+   FFirst := false;
+   exit;
+  end;
+
  FRollImage.ImageIndex:= -1;
- if Sender = FButton[0] then FRollImage.aDirection:= fsLeft;
- if Sender = FButton[1] then FRollImage.aDirection:= fsRight;
+ if FRadioButton[0].Checked then FRollImage.aDirection:= fsLeft;
+ if FRadioButton[1].Checked then FRollImage.aDirection:= fsRight;
  SetPtrValue(FRollImage);
 end;
 

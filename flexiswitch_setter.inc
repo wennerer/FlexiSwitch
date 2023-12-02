@@ -148,7 +148,7 @@ begin
  if not assigned(FRollImage) then FRollImage  := TRollImage.Create;
  if aValue.ImageIndex = -1 then
   begin
-   Direction := aValue.aDirection;
+   Direction := TDirection((ord(FDirection) + 1) mod 2);
    exit;
   end;
 

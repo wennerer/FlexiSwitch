@@ -75,6 +75,7 @@ type
      FRadioButton : array [0..1] of TRadioButton;
      FButton      : array [0..1] of TButton;
      FRollImage   : TRollImage;
+     FFirst       : boolean;
      procedure ButtonsClick(Sender: TObject);
      procedure RadioButtons(Sender: TObject);
      procedure SelectedImage(Sender: TObject);
