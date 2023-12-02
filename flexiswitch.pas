@@ -6,31 +6,85 @@ interface
 
 uses
   Classes, SysUtils, Math, LResources, Forms, Controls, Graphics, Dialogs,
-  IntfGraphics, LCLIntf, LCLProc, GraphType, outsourced, ExtCtrls, LMessages,
-  LCLType;
+  IntfGraphics, LCLIntf, GraphType, PropEdits, outsourced, ExtCtrls, LMessages,
+  LCLType, StdCtrls, LCLProc;
 
 type
-  TClickEvent = procedure(Sender: TObject) of object;
+  TClickEvent      = procedure(Sender: TObject) of object;
 type
-  TMouseMoveEvent = procedure(Sender: TObject;Shift: TShiftState;
-                              X,Y: Integer) of Object;
+  TMouseMoveEvent  = procedure(Sender: TObject;Shift: TShiftState;X,Y: Integer) of Object;
 type
-  TMouseEvent = procedure(Sender: TObject; Button: TMouseButton;
-                          Shift: TShiftState; X, Y: Integer) of Object;
+  TMouseEvent      = procedure(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer) of Object;
 type
   TMouseEnterLeave = procedure(Sender: TObject) of object;
 type
-  TNotifyEvent = procedure(Sender: TObject) of object;
+  TNotifyEvent     = procedure(Sender: TObject) of object;
 type
-  TKeyEvent = procedure(Sender: TObject; var Key: Word; Shift: TShiftState) of Object;
+  TKeyEvent        = procedure(Sender: TObject; var Key: Word; Shift: TShiftState) of Object;
 type
-  TKeyPressEvent = procedure(Sender: TObject; var Key: char) of Object;
+  TKeyPressEvent   = procedure(Sender: TObject; var Key: char) of Object;
 type
-  TChangeEvent = procedure(Sender: TObject) of object;
+  TChangeEvent     = procedure(Sender: TObject) of object;
 
 
 type
   TDirection = (fsRight,fsLeft);
+
+type
+  TRollImage = class (TPersistent)
+   private
+     aDirection : TDirection;
+     ImageIndex : integer;
+  end;
+
+
+type
+
+  { TThumbnail }
+
+  TThumbnail = class(TCustomControl)
+  private
+    FAColor  : TColor;
+    FOnClick : TClickEvent;
+    FImage   : TCustomBitmap;
+    procedure SetAColor(AValue: TColor);
+
+  protected
+
+  public
+   constructor Create(AOwner: TComponent); override;
+   destructor  Destroy; override;
+   procedure MouseEnter; override;
+   procedure MouseLeave; override;
+   procedure MouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);override;
+   procedure Paint; override;
+
+   property aColor : TColor read FAColor write SetAColor;
+   property OnClick      : TClickEvent read FOnClick     write FOnClick;
+  end;
+
+type
+
+    { TPropertyImageSelector }
+
+    TPropertyImageSelector = class (TPropertyEditor)
+    private
+     PEForm       : TCustomForm;
+     FThumbnail   : array [0..39] of TThumbnail;
+     FHigh        : integer;
+     FRadioButton : array [0..1] of TRadioButton;
+     FButton      : array [0..1] of TButton;
+     FRollImage   : TRollImage;
+     procedure ButtonsClick(Sender: TObject);
+     procedure SelectedImage(Sender: TObject);
+    protected
+     procedure DoShowEditor;
+
+    public
+     procedure Edit; Override;
+     function  GetValue: string;Override;
+     function  GetAttributes: TPropertyAttributes; Override;
+    end;
 
 
 type
@@ -39,7 +93,7 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-   FImages             : Array[0..1] of TCustomBitmap;
+   FImages             : Array[0..29] of TCustomBitmap;
    FFinalImage         : TCustomBitmap;
    FInitialImage       : TCustomBitmap;
    FFocusColor         : TColor;
@@ -68,6 +122,7 @@ type
    FOnMouseLeave       : TMouseEnterLeave;
    FOnMouseMove        : TMouseMoveEvent;
    FOnMouseUp          : TMouseEvent;
+   FRollImage          : TRollImage;
    FRotation           : Double;
    FSpeed              : integer;
    FTextStyle          : TTextStyle;
@@ -89,6 +144,8 @@ type
    FBackgroundImage    : TCustomBitmap;
    FButtonImage        : TCustomBitmap;
    FBorderImage        : TCustomBitmap;
+   FImagesCount        : integer;
+
    procedure DrawAHoverEvent;
    procedure DrawFocused;
    procedure DrawNotEnabled;
@@ -115,6 +172,7 @@ type
    procedure SetInitialBgrdColor(AValue: TColor);
    procedure SetInitialCaption(AValue: TCaption);
    procedure SetLayout(AValue: TTextLayout);
+   procedure SetRollImage(AValue: TRollImage);
    procedure SetSpeed(AValue: integer);
    procedure SetTextStyle(AValue: TTextStyle);
    procedure SetEnabled(aValue: boolean);reintroduce;
@@ -207,6 +265,7 @@ type
    //Passt die Texthöhe automatisch der Größe des Controlls an
    property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
 
+   property NewRollImage : TRollImage read FRollImage write SetRollImage;
 
    property TabStop default TRUE;
    property PopupMenu;
@@ -251,6 +310,7 @@ procedure Register;
 begin
   {$I flexiswitch_icon.lrs}
   RegisterComponents('Misc',[TFlexiSwitch]);
+  RegisterPropertyEditor(TypeInfo(TRollImage),nil,'NewRollImage',TPropertyImageSelector); //Hier RollImage muss identisch mit der Property sein
   {$R images.res}
 end;
 
@@ -311,19 +371,28 @@ begin
   FButtonImage.LoadFromResourceName(HInstance,'button_72_72');
   FBorderImage := TPortableNetworkGraphic.Create;
   FBorderImage.LoadFromResourceName(HInstance,'border');
+
   for lv := 0 to High(FImages) do
     FImages[lv] := TPortableNetworkGraphic.Create;
   FImages[0].LoadFromResourceName(HInstance,'off');
   FImages[1].LoadFromResourceName(HInstance,'ok');
+  //load more images, maximal 30
+
+  FImagesCount := High(FImages);
   FInitialImage := TPortableNetworkGraphic.Create;
   FInitialImage.Assign(FImages[0]);
   FFinalImage := TPortableNetworkGraphic.Create;
   FFinalImage.Assign(FImages[1]);
+
+  FRollImage  := TRollImage.Create;
+
 end;
 
 destructor TFlexiSwitch.Destroy;
 var lv : integer;
 begin
+
+ FRollImage.Free;
  FBackgroundImage.Free;
  FButtonImage.Free;
  FBorderImage.Free;
@@ -808,4 +877,5 @@ begin
 end;
 
 {$Include flexiswitch_setter.inc}
+{$Include imageselector.inc}
 end.

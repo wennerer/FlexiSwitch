@@ -10,7 +10,7 @@
       </SearchPaths>
     </CompilerOptions>
     <Version Build="1"/>
-    <Files Count="3">
+    <Files Count="4">
       <Item1>
         <Filename Value="flexiswitch.pas"/>
         <HasRegisterProc Value="True"/>
@@ -24,15 +24,22 @@
         <Filename Value="outsourced.pas"/>
         <UnitName Value="outsourced"/>
       </Item3>
+      <Item4>
+        <Filename Value="imageselector.inc"/>
+        <Type Value="Include"/>
+      </Item4>
     </Files>
     <CompatibilityMode Value="True"/>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="IDEIntf"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="LCL"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

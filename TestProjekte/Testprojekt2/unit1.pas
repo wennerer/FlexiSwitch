@@ -14,6 +14,7 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     FlexiSwitch1: TFlexiSwitch;
+    RadioButton1: TRadioButton;
     procedure Button1Click(Sender: TObject);
   private
 

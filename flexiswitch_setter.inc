@@ -1,7 +1,5 @@
 {%FlexiSwitch --- this is a part of TFlexiSwitch}
 
-
-
 procedure TFlexiSwitch.SetFinalBgrdColor(AValue: TColor);
 begin
   if FFinalBgrdColor=AValue then Exit;
@@ -122,6 +120,23 @@ begin
  if fTextStyle.Layout=AValue then exit;
  fTextStyle.Layout:=AValue;
  if aValue <> tlTop then FCapTop:=0;
+ Invalidate;
+end;
+
+procedure TFlexiSwitch.SetRollImage(AValue: TRollImage);
+begin
+ if aValue.aDirection = fsLeft then
+  begin
+   if assigned(FInitialImage) then FreeAndNil(FInitialImage);
+   FInitialImage := TPortableNetworkGraphic.Create;
+   FInitialImage.Assign(FImages[aValue.ImageIndex]);
+  end;
+ if aValue.aDirection = fsRight then
+  begin
+   if assigned(FFinalImage) then FreeAndNil(FFinalImage);
+   FFinalImage := TPortableNetworkGraphic.Create;
+   FFinalImage.Assign(FImages[aValue.ImageIndex]);
+  end;
  Invalidate;
 end;
 
