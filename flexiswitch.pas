@@ -76,6 +76,7 @@ type
      FButton      : array [0..1] of TButton;
      FRollImage   : TRollImage;
      procedure ButtonsClick(Sender: TObject);
+     procedure RadioButtons(Sender: TObject);
      procedure SelectedImage(Sender: TObject);
     protected
      procedure DoShowEditor;
@@ -94,8 +95,9 @@ type
   TFlexiSwitch = class(TCustomControl)
   private
    FImages             : Array[0..29] of TCustomBitmap;
-   FFinalImage         : TCustomBitmap;
-   FInitialImage       : TCustomBitmap;
+   FLeftImageIndex     : integer;
+   FRightImage         : TCustomBitmap;
+   FLeftImage          : TCustomBitmap;
    FFocusColor         : TColor;
    FBestTextHeight     : boolean;
    FFocusedBlendFaktor : Double;
@@ -108,8 +110,8 @@ type
    FCaption            : TCaption;
    FDirection          : TDirection;
    FAngel              : Double;
-   FInitialCaption     : TCaption;
-   FFinalCaption       : TCaption;
+   FLeftCaption        : TCaption;
+   FRightCaption       : TCaption;
    FOnChange           : TChangeEvent;
    FOnClick            : TClickEvent;
    FOnEnter            : TNotifyEvent;
@@ -122,6 +124,7 @@ type
    FOnMouseLeave       : TMouseEnterLeave;
    FOnMouseMove        : TMouseMoveEvent;
    FOnMouseUp          : TMouseEvent;
+   FRightImageIndex    : integer;
    FRollImage          : TRollImage;
    FRotation           : Double;
    FSpeed              : integer;
@@ -129,11 +132,11 @@ type
    FTimer              : TTimer;
    FBorderColor        : TColor;
    FButtonColor        : TColor;
-   FFinalBgrdColor     : TColor;
+   FRightBgrdColor     : TColor;
    FHoverColor         : TColor;
    FHover              : boolean;
    FHoverBlendFaktor   : Double;
-   FInitialBgrdColor   : TColor;
+   FLeftBgrdColor   : TColor;
    FOldWidth           : integer;
    FOldHeight          : integer;
    FPortion            : Double;
@@ -164,14 +167,16 @@ type
    procedure SetCapTop(AValue: integer);
    procedure SetDirection(AValue: TDirection);
    procedure SetDisabledColor(AValue: TColor);
-   procedure SetFinalBgrdColor(AValue: TColor);
-   procedure SetFinalCaption(AValue: TCaption);
+   procedure SetLeftImageIndex(AValue: integer);
+   procedure SetRightBgrdColor(AValue: TColor);
+   procedure SetRightCaption(AValue: TCaption);
    procedure SetFocusColor(AValue: TColor);
    procedure SetFont(AValue: TFont);
    procedure SetHoverColor(AValue: TColor);
-   procedure SetInitialBgrdColor(AValue: TColor);
-   procedure SetInitialCaption(AValue: TCaption);
+   procedure SetLeftBgrdColor(AValue: TColor);
+   procedure SetLeftCaption(AValue: TCaption);
    procedure SetLayout(AValue: TTextLayout);
+   procedure SetRightImageIndex(AValue: integer);
    procedure SetRollImage(AValue: TRollImage);
    procedure SetSpeed(AValue: integer);
    procedure SetTextStyle(AValue: TTextStyle);
@@ -194,7 +199,7 @@ type
    procedure MouseMove({%H-}Shift: TShiftState; X, Y: Integer);override;
    procedure MouseDown({%H-}Button: TMouseButton;{%H-}Shift: TShiftState; X, Y: Integer);override;
    procedure MouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);override;
-   procedure LoadImagesfromFile(InitialFilename,FinalFilename: string);
+   procedure LoadImagesfromFile(LeftFilename,RightFilename: string);
    procedure Paint; override;
 
    property HoverBlendFaktor : Double read FHoverBlendFaktor write FHoverBlendFaktor;
@@ -210,12 +215,12 @@ type
    property EnabledBlendFaktor : Double read FEnabledBlendFaktor write FEnabledBlendFaktor;
 
   published
-   //The initial background colour
-   //Die anfängliche Hintergrundfarbe
-   property InitialBgrdColor : TColor read FInitialBgrdColor write SetInitialBgrdColor default $000000C8;
-   //The final background colour
-   //Die finale Hintergrundfarbe
-   property FinalBgrdColor : TColor read FFinalBgrdColor write SetFinalBgrdColor default $0000C800;
+   //The Left background colour
+   //Die linke Hintergrundfarbe
+   property LeftBgrdColor : TColor read FLeftBgrdColor write SetLeftBgrdColor default $000000C8;
+   //The Right background colour
+   //Die rechte Hintergrundfarbe
+   property RightBgrdColor : TColor read FRightBgrdColor write SetRightBgrdColor default $0000C800;
    //The color of the button
    //Die Farbe des Buttons
    property ButtonColor : TColor read FButtonColor write SetButtonColor default clNone;
@@ -239,10 +244,10 @@ type
    property Speed            : integer read FSpeed write SetSpeed default 10;
    //The caption that is displayed when the button is on the left
    //Die Caption die angezeigt wird wenn der Button links ist
-   property InitialCaption   : TCaption read FInitialCaption write SetInitialCaption;
+   property LeftCaption   : TCaption read FLeftCaption write SetLeftCaption;
    //The caption that is displayed when the button is on the right
    //Die Caption die angezeigt wird wenn der Button rechts ist
-   property FinalCaption     : TCaption read FFinalCaption  write SetFinalCaption;
+   property RightCaption     : TCaption read FRightCaption  write SetRightCaption;
    //The font to be used for text display in this switch.
    //Die Schrift die für die Textanzeige in diesem Schalter verwendet werden soll.
    property Font: TFont read fFont write SetFont;
@@ -266,6 +271,13 @@ type
    property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
 
    property NewRollImage : TRollImage read FRollImage write SetRollImage;
+
+   property LeftImageIndex : integer read FLeftImageIndex write SetLeftImageIndex default 0;
+
+
+   property RightImageIndex : integer read FRightImageIndex write SetRightImageIndex default 1;
+
+
 
    property TabStop default TRUE;
    property PopupMenu;
@@ -334,8 +346,8 @@ begin
   FRotation            := 30;
   FDirection           := fsLeft;
   FEnabled             := true;
-  FInitialBgrdColor    := rgb(200,0,0);
-  FFinalBgrdColor      := rgb(0,200,0);
+  FLeftBgrdColor    := rgb(200,0,0);
+  FRightBgrdColor      := rgb(0,200,0);
   FButtonColor         := clNone;
   FBorderColor         := clNone;
   FHoverColor          := clNone;
@@ -352,9 +364,9 @@ begin
   FTimer.Enabled    := false;
   FTimer.OnTimer    :=@FTimerTimer;
 
-  FInitialCaption   := 'OFF';
-  FFinalCaption     := 'ON';
-  FCaption          := FInitialCaption;
+  FLeftCaption   := 'OFF';
+  FRightCaption     := 'ON';
+  FCaption          := FLeftCaption;
   FFont             := TFont.Create;
   FFont.Color       := clWhite;
   FFont.Style       := [fsbold];
@@ -372,6 +384,8 @@ begin
   FBorderImage := TPortableNetworkGraphic.Create;
   FBorderImage.LoadFromResourceName(HInstance,'border');
 
+  FLeftImageIndex  := 0;
+  FRightImageIndex := 1;
   for lv := 0 to High(FImages) do
     FImages[lv] := TPortableNetworkGraphic.Create;
   FImages[0].LoadFromResourceName(HInstance,'off');
@@ -379,12 +393,12 @@ begin
   //load more images, maximal 30
 
   FImagesCount := High(FImages);
-  FInitialImage := TPortableNetworkGraphic.Create;
-  FInitialImage.Assign(FImages[0]);
-  FFinalImage := TPortableNetworkGraphic.Create;
-  FFinalImage.Assign(FImages[1]);
+  FLeftImage := TPortableNetworkGraphic.Create;
+  FLeftImage.Assign(FImages[FLeftImageIndex]);
+  FRightImage := TPortableNetworkGraphic.Create;
+  FRightImage.Assign(FImages[FRightImageIndex]);
 
-  FRollImage  := TRollImage.Create;
+
 
 end;
 
@@ -392,12 +406,12 @@ destructor TFlexiSwitch.Destroy;
 var lv : integer;
 begin
 
- FRollImage.Free;
+ if assigned(FRollImage) then FRollImage.Free;
  FBackgroundImage.Free;
  FButtonImage.Free;
  FBorderImage.Free;
- FInitialImage.Free;
- FFinalImage.Free;
+ FLeftImage.Free;
+ FRightImage.Free;
  for lv := 0 to High(FImages) do FImages[lv].Free;
  FTimer.Free;
  FFont.Free;
@@ -457,49 +471,49 @@ begin
    end;
 end;
 
-procedure TFlexiSwitch.LoadImagesfromFile(InitialFilename, FinalFilename: string);
-var oldiniimg, oldfinalimg : TCustomBitmap;
+procedure TFlexiSwitch.LoadImagesfromFile(LeftFilename, RightFilename: string);
+var oldiniimg, oldRightimg : TCustomBitmap;
 begin
  oldiniimg   :=TPortableNetworkGraphic.Create;
- oldfinalimg :=TPortableNetworkGraphic.Create;
+ oldRightimg :=TPortableNetworkGraphic.Create;
  try
-  if assigned(FInitialImage) then
+  if assigned(FLeftImage) then
    begin
-    oldiniimg.Assign(FInitialImage);
-    FreeAndNil(FInitialImage);
+    oldiniimg.Assign(FLeftImage);
+    FreeAndNil(FLeftImage);
    end;
-  if assigned(FFinalImage)   then
+  if assigned(FRightImage)   then
    begin
-    oldfinalimg.Assign(FFinalImage);
-    FreeAndNil(FFinalImage);
+    oldRightimg.Assign(FRightImage);
+    FreeAndNil(FRightImage);
    end;
- FInitialImage := TPortableNetworkGraphic.Create;
- FFinalImage   := TPortableNetworkGraphic.Create;
+ FLeftImage := TPortableNetworkGraphic.Create;
+ FRightImage   := TPortableNetworkGraphic.Create;
   try
-   if fileexists(InitialFilename) and fileexists(FinalFilename) then
+   if fileexists(LeftFilename) and fileexists(RightFilename) then
     begin
-     FInitialImage.LoadFromFile(InitialFilename);
-     FFinalImage.LoadFromFile(FinalFilename);
-     if (FInitialImage.Width <> FFinalImage.Width) or (FInitialImage.Height <> FFinalImage.Height) then
+     FLeftImage.LoadFromFile(LeftFilename);
+     FRightImage.LoadFromFile(RightFilename);
+     if (FLeftImage.Width <> FRightImage.Width) or (FLeftImage.Height <> FRightImage.Height) then
       begin
-       FInitialImage.Assign(oldiniimg);
-       FFinalImage.Assign(oldfinalimg);
+       FLeftImage.Assign(oldiniimg);
+       FRightImage.Assign(oldRightimg);
        showmessage('The size of the images must be the same!');
       end;
     end
    else
     begin
-     FInitialImage.Assign(oldiniimg);
-     FFinalImage.Assign(oldfinalimg);
+     FLeftImage.Assign(oldiniimg);
+     FRightImage.Assign(oldRightimg);
      showmessage('Incorrect path');
     end;
   except
    showmessage('Wrong Graphicformat, only PNG!');
   end;
 
- finally
+ Finally
   oldiniimg.Free;
-  oldfinalimg.Free;
+  oldRightimg.Free;
  end;
  Invalidate;
 end;
@@ -618,7 +632,7 @@ begin
       FPortion := 1;
       FTimer.Enabled:= false;
       FRollPos := width - (FButtonSize + (2*FMargin));
-      FCaption := FFinalCaption;
+      FCaption := FRightCaption;
      end;
    end;
    if FDirection = fsLeft then
@@ -632,7 +646,7 @@ begin
       FPortion := 0;
       FTimer.Enabled:= false;
       FRollPos := 0 ;
-      FCaption := FInitialCaption;
+      FCaption := FLeftCaption;
      end;
    end;
    Invalidate;
@@ -659,22 +673,22 @@ procedure TFlexiSwitch.DrawTheBackground;
 var TmpBmp                     : TBitmap;
     TempImg1,TempImg2,TempImg3 : TLazIntfImage;
 begin
- if (FInitialBgrdColor <> clNone) and (FFinalBgrdColor <> clNone) then
+ if (FLeftBgrdColor <> clNone) and (FRightBgrdColor <> clNone) then
   begin
    TempImg1 := FBackgroundImage.CreateIntfImage;
    TempImg2 := FBackgroundImage.CreateIntfImage;
    TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TmpBmp  := TBitmap.Create;
    try
-    ChangeColor(TempImg1,FInitialBgrdColor);
-    ChangeColor(TempImg2,FFinalBgrdColor);
+    ChangeColor(TempImg1,FLeftBgrdColor);
+    ChangeColor(TempImg2,FRightBgrdColor);
     BlendImages(TempImg1,TempImg2,FPortion);
     TempImg3.SetSize(Width,Height);
     StretchDrawImgToImg(TempImg1,TempImg3,width,height);
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg3);
     Canvas.Draw(0,0,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TempImg3.Free;
@@ -699,7 +713,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(0,0,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TmpBmp.Free;
@@ -726,7 +740,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(0,0,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TmpBmp.Free;
@@ -750,7 +764,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TmpBmp.Free;
@@ -763,10 +777,10 @@ var TmpBmp                     : TBitmap;
     TempImg1,TempImg2,TempImg3 : TLazIntfImage;
 begin
  if FButtonColor = clNone then
- if assigned(FInitialImage) and assigned(FFinalImage) then
+ if assigned(FLeftImage) and assigned(FRightImage) then
   begin
-   TempImg1 := FInitialImage.CreateIntfImage;
-   TempImg2 := FFinalImage.CreateIntfImage;
+   TempImg1 := FLeftImage.CreateIntfImage;
+   TempImg2 := FRightImage.CreateIntfImage;
    TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TmpBmp   := TBitmap.Create;
    try
@@ -780,7 +794,7 @@ begin
     if (FDirection = fsRight) and not FTimer.Enabled then
      FRollPos := width - (FButtonSize + (2*FMargin));
     Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TempImg3.Free;
@@ -818,7 +832,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(0,0,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TmpBmp.Free;
@@ -844,7 +858,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(0,0,TmpBmp);
-   finally
+   Finally
     TempImg1.Free;
     TempImg2.Free;
     TmpBmp.Free;

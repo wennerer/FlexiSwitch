@@ -1,18 +1,18 @@
 {%FlexiSwitch --- this is a part of TFlexiSwitch}
 
-procedure TFlexiSwitch.SetFinalBgrdColor(AValue: TColor);
+procedure TFlexiSwitch.SetRightBgrdColor(AValue: TColor);
 begin
-  if FFinalBgrdColor=AValue then Exit;
-  if aValue = clNone then FFinalBgrdColor:= clNone else
-  FFinalBgrdColor:=System_ToRGB(AValue);
+  if FRightBgrdColor=AValue then Exit;
+  if aValue = clNone then FRightBgrdColor:= clNone else
+  FRightBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
 
-procedure TFlexiSwitch.SetFinalCaption(AValue: TCaption);
+procedure TFlexiSwitch.SetRightCaption(AValue: TCaption);
 begin
  if aValue = '' then aValue:=' ';
- if FFinalCaption=AValue then Exit;
- FFinalCaption:=AValue;
+ if FRightCaption=AValue then Exit;
+ FRightCaption:=AValue;
  if FDirection = fsRight then FCaption := aValue;
  Invalidate;
 end;
@@ -69,14 +69,14 @@ begin
     FPortion := 0;
     FAngel := 0;
     FRollPos := 0;
-    FCaption := FInitialCaption;
+    FCaption := FLeftCaption;
    end
    else
    begin
     FPortion:= 1;
     FAngel :=  360;
     FRollPos := width - (FButtonSize + (2*FMargin));
-    FCaption := FFinalCaption;
+    FCaption := FRightCaption;
    end;
   Invalidate;
 end;
@@ -89,6 +89,16 @@ begin
   Invalidate;
 end;
 
+procedure TFlexiSwitch.SetLeftImageIndex(AValue: integer);
+begin
+  if FLeftImageIndex=AValue then Exit;
+  FLeftImageIndex:=AValue;
+  if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+  FLeftImage := TPortableNetworkGraphic.Create;
+  FLeftImage.Assign(FImages[FLeftImageIndex]);
+  Invalidate;
+end;
+
 
 procedure TFlexiSwitch.SetBorderColor(AValue: TColor);
 begin
@@ -98,19 +108,19 @@ begin
   Invalidate;
 end;
 
-procedure TFlexiSwitch.SetInitialBgrdColor(AValue: TColor);
+procedure TFlexiSwitch.SetLeftBgrdColor(AValue: TColor);
 begin
-  if FInitialBgrdColor=AValue then Exit;
-  if aValue = clNone then FInitialBgrdColor:= clNone else
-  FInitialBgrdColor:=System_ToRGB(AValue);
+  if FLeftBgrdColor=AValue then Exit;
+  if aValue = clNone then FLeftBgrdColor:= clNone else
+  FLeftBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
 
-procedure TFlexiSwitch.SetInitialCaption(AValue: TCaption);
+procedure TFlexiSwitch.SetLeftCaption(AValue: TCaption);
 begin
  if aValue = '' then aValue:=' ';
- if FInitialCaption=AValue then Exit;
- FInitialCaption:=AValue;
+ if FLeftCaption=AValue then Exit;
+ FLeftCaption:=AValue;
  if FDirection = fsLeft then FCaption := aValue;
  Invalidate;
 end;
@@ -123,19 +133,38 @@ begin
  Invalidate;
 end;
 
+procedure TFlexiSwitch.SetRightImageIndex(AValue: integer);
+begin
+  if FRightImageIndex=AValue then Exit;
+  FRightImageIndex:=AValue;
+  if assigned(FRightImage) then FreeAndNil(FRightImage);
+  FRightImage := TPortableNetworkGraphic.Create;
+  FRightImage.Assign(FImages[FRightImageIndex]);
+  Invalidate;
+end;
+
 procedure TFlexiSwitch.SetRollImage(AValue: TRollImage);
 begin
+ if not assigned(FRollImage) then FRollImage  := TRollImage.Create;
+ if aValue.ImageIndex = -1 then
+  begin
+   Direction := aValue.aDirection;
+   exit;
+  end;
+
  if aValue.aDirection = fsLeft then
   begin
-   if assigned(FInitialImage) then FreeAndNil(FInitialImage);
-   FInitialImage := TPortableNetworkGraphic.Create;
-   FInitialImage.Assign(FImages[aValue.ImageIndex]);
+   if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+   FLeftImage := TPortableNetworkGraphic.Create;
+   FLeftImage.Assign(FImages[aValue.ImageIndex]);
+   FLeftImageIndex := aValue.ImageIndex;
   end;
  if aValue.aDirection = fsRight then
   begin
-   if assigned(FFinalImage) then FreeAndNil(FFinalImage);
-   FFinalImage := TPortableNetworkGraphic.Create;
-   FFinalImage.Assign(FImages[aValue.ImageIndex]);
+   if assigned(FRightImage) then FreeAndNil(FRightImage);
+   FRightImage := TPortableNetworkGraphic.Create;
+   FRightImage.Assign(FImages[aValue.ImageIndex]);
+   FRightImageIndex := aValue.ImageIndex;
   end;
  Invalidate;
 end;

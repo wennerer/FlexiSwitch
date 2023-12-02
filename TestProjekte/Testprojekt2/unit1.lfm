@@ -15,19 +15,6 @@ object Form1: TForm1
     OnClick = Button1Click
     TabOrder = 0
   end
-  object FlexiSwitch1: TFlexiSwitch
-    Left = 112
-    Height = 53
-    Top = 88
-    Width = 122
-    Direction = fsRight
-    InitialCaption = 'OFF'
-    FinalCaption = 'ON'
-    Font.Color = clWhite
-    Font.Height = 29
-    Font.Style = [fsBold]
-    TabOrder = 1
-  end
   object RadioButton1: TRadioButton
     Left = 82
     Height = 23
@@ -35,7 +22,19 @@ object Form1: TForm1
     Width = 111
     Caption = 'RadioButton1'
     Checked = True
-    TabOrder = 2
+    TabOrder = 1
     TabStop = True
+  end
+  object FlexiSwitch1: TFlexiSwitch
+    Left = 88
+    Height = 54
+    Top = 64
+    Width = 125
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 30
+    Font.Style = [fsBold]
+    TabOrder = 2
   end
 end

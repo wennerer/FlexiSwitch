@@ -19,11 +19,13 @@ begin
   for lv := 0 to FHigh do
     FImages[lv] := TPortableNetworkGraphic.Create;
 
+
   FImages[0].LoadFromResourceName(HInstance,'off');
   FImages[1].LoadFromResourceName(HInstance,'ok');
   //load more images, maximal 30
 
-  FRollImage   := TRollImage.Create;
+  FRollImage            := TRollImage.Create;
+  FRollImage.aDirection := TFlexiSwitch(GetComponent(0)).FDirection;
 
   i := 0;j:=0;
   for lv := 0 to 39 do
@@ -50,10 +52,11 @@ begin
     FRadioButton[lv].Parent := PEForm;
     FRadioButton[lv].Left   :=  20;
     FRadioButton[lv].Top    := 440 + (lv*30);
+    FRadioButton[lv].OnClick:=@RadioButtons;
    end;
-  FRadioButton[0].Caption := 'InitialRollImage [Left]';
+  FRadioButton[0].Caption := 'LeftRollImage [Left]';
   FRadioButton[0].Checked := true;
-  FRadioButton[1].Caption := 'FinalRollImage [Right]';
+  FRadioButton[1].Caption := 'RightRollImage [Right]';
 
   for lv := 0 to 1 do
    begin
@@ -70,7 +73,7 @@ begin
 
    PEForm.ShowModal;
 
- finally
+ Finally
    FRollImage.Free;
    for lv := 0 to FHigh do FImages[lv].Free;
    for lv := 0 to 9 do FThumbnail[lv].Free;
@@ -100,6 +103,14 @@ begin
    else FRollImage.aDirection := fsRight;
    SetPtrValue(FRollImage);
   end;
+end;
+
+procedure TPropertyImageSelector.RadioButtons(Sender: TObject);
+begin
+ FRollImage.ImageIndex:= -1;
+ if Sender = FButton[0] then FRollImage.aDirection:= fsLeft;
+ if Sender = FButton[1] then FRollImage.aDirection:= fsRight;
+ SetPtrValue(FRollImage);
 end;
 
 
