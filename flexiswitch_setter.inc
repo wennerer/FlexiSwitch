@@ -89,9 +89,38 @@ begin
   Invalidate;
 end;
 
+procedure TFlexiSwitch.SetEnabledBlendFaktor(AValue: Double);
+begin
+  if FEnabledBlendFaktor=AValue then Exit;
+  FEnabledBlendFaktor:=AValue;
+  Invalidate;
+end;
+
+procedure TFlexiSwitch.SetImgSizeFactor(AValue: double);
+begin
+  if FImgSizeFactor=AValue then Exit;
+  FImgSizeFactor:=AValue;
+  Invalidate;
+end;
+
 procedure TFlexiSwitch.SetLeftImageIndex(AValue: integer);
 begin
+  if FLoadFromFile then
+   begin
+    FLoadFromFile := false;
+    if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+    if assigned(FRightImage) then FreeAndNil(FRightImage);
+    FRightImage := TPortableNetworkGraphic.Create;
+    FRightImage.Assign(FImages[1]);
+    FLeftImage := TPortableNetworkGraphic.Create;
+    FLeftImage.Assign(FImages[0]);
+    FImgSizeFactor := 1;
+    FLeft          := 0;
+    FTop           := 0;
+   end;
   if FLeftImageIndex=AValue then Exit;
+  if aValue < 0 then aValue := 0;
+  if aValue > High(FImages) then aValue := High(FImages);
   FLeftImageIndex:=AValue;
   if assigned(FLeftImage) then FreeAndNil(FLeftImage);
   FLeftImage := TPortableNetworkGraphic.Create;
@@ -135,7 +164,22 @@ end;
 
 procedure TFlexiSwitch.SetRightImageIndex(AValue: integer);
 begin
+  if FLoadFromFile then
+   begin
+    FLoadFromFile := false;
+    if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+    if assigned(FRightImage) then FreeAndNil(FRightImage);
+    FRightImage := TPortableNetworkGraphic.Create;
+    FRightImage.Assign(FImages[1]);
+    FLeftImage := TPortableNetworkGraphic.Create;
+    FLeftImage.Assign(FImages[0]);
+    FImgSizeFactor := 1;
+    FLeft          := 0;
+    FTop           := 0;
+   end;
   if FRightImageIndex=AValue then Exit;
+  if aValue < 0 then aValue := 0;
+  if aValue > High(FImages) then aValue := High(FImages);
   FRightImageIndex:=AValue;
   if assigned(FRightImage) then FreeAndNil(FRightImage);
   FRightImage := TPortableNetworkGraphic.Create;
@@ -186,6 +230,12 @@ begin
  if FEnabled = aValue then Exit;
  FEnabled:=aValue;
  Invalidate;
+end;
+
+procedure TFlexiSwitch.BoundsChanged;
+begin
+  inherited BoundsChanged;
+  Invalidate;
 end;
 
 

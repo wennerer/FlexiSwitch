@@ -3,12 +3,15 @@
   <Package Version="5">
     <Name Value="FlexiPackage"/>
     <Type Value="RunAndDesignTime"/>
+    <Author Value="Bernd Hübner (wennerer)"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
         <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
+    <Description Value="A liite toogle switch component"/>
+    <License Value="modified LGPL-2"/>
     <Version Build="1"/>
     <Files Count="4">
       <Item1>

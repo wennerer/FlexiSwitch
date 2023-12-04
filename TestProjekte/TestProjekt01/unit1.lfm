@@ -1,16 +1,550 @@
 object Form1: TForm1
-  Left = 342
-  Height = 464
-  Top = 250
-  Width = 753
+  Left = 400
+  Height = 800
+  Top = 150
+  Width = 789
   Caption = 'Form1'
-  ClientHeight = 464
-  ClientWidth = 753
-  OnCreate = FormCreate
+  ClientHeight = 800
+  ClientWidth = 789
+  Color = clWhite
   object FlexiSwitch1: TFlexiSwitch
-    Left = 255
-    Height = 78
-    Top = 133
-    Width = 180
+    Left = 32
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    TabOrder = 0
+  end
+  object aFlexiSwitch: TFlexiSwitch
+    Left = 32
+    Height = 39
+    Top = 80
+    Width = 90
+    LeftCaption = 'Aus'
+    RightCaption = 'Ein'
+    Font.Color = clWhite
+    Font.Height = 21
+    Font.Style = [fsBold]
+    TabOrder = 1
+  end
+  object TrackBar1: TTrackBar
+    Left = 172
+    Height = 37
+    Top = 184
+    Width = 100
+    Max = 180
+    Min = 21
+    OnChange = TrackBar1Change
+    Position = 21
+    TabOrder = 2
+  end
+  object StaticText1: TStaticText
+    Left = 32
+    Height = 25
+    Top = 196
+    Width = 66
+    Caption = 'Size :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 3
+  end
+  object StaticText2: TStaticText
+    Left = 32
+    Height = 25
+    Top = 240
+    Width = 120
+    Caption = 'Roll on/off :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 4
+  end
+  object CheckBox1: TCheckBox
+    Left = 172
+    Height = 23
+    Top = 240
+    Width = 23
+    Checked = True
+    OnChange = CheckBox1Change
+    State = cbChecked
+    TabOrder = 5
+  end
+  object StaticText3: TStaticText
+    Left = 32
+    Height = 25
+    Top = 288
+    Width = 120
+    Caption = 'Speed : '
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 6
+  end
+  object SpinEdit1: TSpinEdit
+    Left = 172
+    Height = 27
+    Top = 286
+    Width = 100
+    MaxValue = 100
+    MinValue = 1
+    OnChange = SpinEdit1Change
+    TabOrder = 7
+    Value = 10
+  end
+  object StaticText4: TStaticText
+    Left = 320
+    Height = 25
+    Top = 196
+    Width = 120
+    Caption = 'FocusColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 8
+  end
+  object ColorBox1: TColorBox
+    Left = 464
+    Height = 25
+    Top = 196
+    Width = 100
+    DefaultColorColor = clRed
+    Selected = clRed
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    ItemHeight = 0
+    OnChange = ColorBox1Change
+    TabOrder = 9
+  end
+  object StaticText5: TStaticText
+    Left = 584
+    Height = 25
+    Top = 196
+    Width = 70
+    Caption = 'Blend :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 10
+  end
+  object FloatSpinEdit1: TFloatSpinEdit
+    Left = 680
+    Height = 27
+    Top = 196
+    Width = 74
+    Increment = 0.1
+    MaxValue = 1
+    OnChange = FloatSpinEdit1Change
+    TabOrder = 11
+    Value = 0.1
+  end
+  object StaticText6: TStaticText
+    Left = 320
+    Height = 25
+    Top = 240
+    Width = 120
+    Caption = 'HoverColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 12
+  end
+  object ColorBox2: TColorBox
+    Left = 464
+    Height = 25
+    Top = 240
+    Width = 100
+    DefaultColorColor = clNone
+    Selected = clNone
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    ItemHeight = 0
+    OnChange = ColorBox2Change
+    TabOrder = 13
+  end
+  object StaticText7: TStaticText
+    Left = 584
+    Height = 25
+    Top = 240
+    Width = 70
+    Caption = 'Blend :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 14
+  end
+  object FloatSpinEdit2: TFloatSpinEdit
+    Left = 680
+    Height = 27
+    Top = 238
+    Width = 74
+    Increment = 0.1
+    MaxValue = 1
+    OnChange = FloatSpinEdit2Change
+    TabOrder = 15
+    Value = 0.2
+  end
+  object StaticText8: TStaticText
+    Left = 320
+    Height = 25
+    Top = 288
+    Width = 128
+    Caption = 'ButtonColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 16
+  end
+  object ColorBox3: TColorBox
+    Left = 464
+    Height = 25
+    Top = 288
+    Width = 100
+    DefaultColorColor = clNone
+    Selected = clNone
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    ItemHeight = 0
+    OnChange = ColorBox3Change
+    TabOrder = 17
+  end
+  object StaticText9: TStaticText
+    Left = 584
+    Height = 18
+    Top = 288
+    Width = 156
+    AutoSize = True
+    Caption = '<> clNone kein RollImage'
+    TabOrder = 18
+  end
+  object StaticText10: TStaticText
+    Left = 32
+    Height = 25
+    Top = 424
+    Width = 128
+    Caption = 'Left BkColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 19
+  end
+  object ColorBox4: TColorBox
+    Left = 172
+    Height = 25
+    Top = 424
+    Width = 100
+    DefaultColorColor = clRed
+    Selected = clRed
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    Color = clRed
+    ItemHeight = 0
+    OnChange = ColorBox4Change
+    TabOrder = 20
+  end
+  object StaticText11: TStaticText
+    Left = 320
+    Height = 25
+    Top = 424
+    Width = 144
+    Caption = 'Right BkColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 21
+  end
+  object ColorBox5: TColorBox
+    Left = 464
+    Height = 25
+    Top = 424
+    Width = 100
+    Selected = clGreen
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    Color = clWhite
+    ItemHeight = 0
+    OnChange = ColorBox5Change
+    TabOrder = 22
+  end
+  object StaticText12: TStaticText
+    Left = 32
+    Height = 25
+    Top = 472
+    Width = 128
+    Caption = 'Left Caption :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 23
+  end
+  object Edit1: TEdit
+    Left = 172
+    Height = 27
+    Top = 470
+    Width = 100
+    OnChange = Edit1Change
+    TabOrder = 24
+    Text = 'Aus'
+  end
+  object StaticText13: TStaticText
+    Left = 320
+    Height = 25
+    Top = 472
+    Width = 144
+    Caption = 'Right Caption :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 25
+  end
+  object Edit2: TEdit
+    Left = 464
+    Height = 27
+    Top = 470
+    Width = 100
+    OnChange = Edit2Change
+    TabOrder = 26
+    Text = 'Ein'
+  end
+  object CheckBox2: TCheckBox
+    Left = 584
+    Height = 23
+    Top = 470
+    Width = 112
+    Caption = 'BestTextHight'
+    Checked = True
+    OnChange = CheckBox2Change
+    State = cbChecked
+    TabOrder = 27
+  end
+  object StaticText14: TStaticText
+    Left = 32
+    Height = 25
+    Top = 568
+    Width = 128
+    Caption = 'Left ImgIdx:'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 28
+  end
+  object SpinEdit2: TSpinEdit
+    Left = 172
+    Height = 27
+    Top = 568
+    Width = 100
+    MaxValue = 8
+    OnChange = SpinEdit2Change
+    TabOrder = 29
+  end
+  object StaticText15: TStaticText
+    Left = 320
+    Height = 25
+    Top = 568
+    Width = 128
+    Caption = 'Right ImgIdx:'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 30
+  end
+  object SpinEdit3: TSpinEdit
+    Left = 464
+    Height = 27
+    Top = 568
+    Width = 98
+    MaxValue = 8
+    OnChange = SpinEdit3Change
+    TabOrder = 31
+    Value = 1
+  end
+  object RadioButton1: TRadioButton
+    Left = 32
+    Height = 27
+    Top = 384
+    Width = 151
+    Caption = 'Direction Left'
+    Checked = True
+    Font.Height = 20
+    OnChange = RadioButton1Change
+    ParentFont = False
+    TabOrder = 32
+    TabStop = True
+  end
+  object RadioButton2: TRadioButton
+    Left = 320
+    Height = 27
+    Top = 384
+    Width = 163
+    Caption = 'Direction Right'
+    Font.Height = 20
+    OnChange = RadioButton1Change
+    ParentFont = False
+    TabOrder = 33
+  end
+  object StaticText16: TStaticText
+    Left = 32
+    Height = 25
+    Top = 336
+    Width = 136
+    Caption = 'BorderColor :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 34
+  end
+  object ColorBox6: TColorBox
+    Left = 172
+    Height = 25
+    Top = 336
+    Width = 100
+    Selected = clNone
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    ItemHeight = 0
+    OnChange = ColorBox6Change
+    TabOrder = 35
+  end
+  object StaticText17: TStaticText
+    Left = 320
+    Height = 25
+    Top = 336
+    Width = 128
+    Caption = 'Enabled :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 36
+  end
+  object CheckBox3: TCheckBox
+    Left = 464
+    Height = 23
+    Top = 336
+    Width = 23
+    Checked = True
+    OnChange = CheckBox3Change
+    State = cbChecked
+    TabOrder = 37
+  end
+  object StaticText18: TStaticText
+    Left = 584
+    Height = 25
+    Top = 334
+    Width = 70
+    Caption = 'Blend :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 38
+  end
+  object FloatSpinEdit3: TFloatSpinEdit
+    Left = 680
+    Height = 27
+    Top = 334
+    Width = 74
+    Increment = 0.1
+    MaxValue = 1
+    OnChange = FloatSpinEdit3Change
+    TabOrder = 39
+    Value = 0.7
+  end
+  object StaticText19: TStaticText
+    Left = 584
+    Height = 14
+    Top = 568
+    Width = 185
+    AutoSize = True
+    Caption = 'ButtonColor<> clNone kein RollImage'
+    Font.Height = -9
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 40
+  end
+  object Button1: TButton
+    Left = 32
+    Height = 25
+    Top = 616
+    Width = 240
+    Caption = 'Load images from file'
+    OnClick = Button1Click
+    TabOrder = 41
+  end
+  object StaticText20: TStaticText
+    Left = 320
+    Height = 25
+    Top = 616
+    Width = 144
+    Caption = 'ImgSizeFactor:'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 42
+  end
+  object FloatSpinEdit4: TFloatSpinEdit
+    Left = 464
+    Height = 27
+    Top = 616
+    Width = 98
+    Increment = 0.1
+    MaxValue = 1
+    OnChange = FloatSpinEdit4Change
+    TabOrder = 43
+    Value = 0.7
+  end
+  object StaticText21: TStaticText
+    Left = 32
+    Height = 25
+    Top = 520
+    Width = 128
+    Caption = 'Font Color :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 44
+  end
+  object ColorBox7: TColorBox
+    Left = 172
+    Height = 25
+    Top = 520
+    Width = 100
+    DefaultColorColor = clRed
+    Selected = clWhite
+    Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
+    Color = clRed
+    ItemHeight = 0
+    OnChange = ColorBox7Change
+    TabOrder = 45
+  end
+  object StaticText22: TStaticText
+    Left = 320
+    Height = 25
+    Top = 520
+    Width = 144
+    Caption = 'Font Height :'
+    Font.Height = -19
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 46
+  end
+  object SpinEdit4: TSpinEdit
+    Left = 464
+    Height = 27
+    Top = 520
+    Width = 98
+    MaxValue = 30
+    MinValue = 4
+    OnChange = SpinEdit4Change
+    TabOrder = 47
+    Value = 12
+  end
+  object StaticText23: TStaticText
+    Left = 584
+    Height = 19
+    Top = 528
+    Width = 178
+    AutoSize = True
+    Caption = 'only without BestTextHight'
+    Font.Height = -13
+    Font.Name = 'Sans'
+    ParentFont = False
+    TabOrder = 48
   end
 end

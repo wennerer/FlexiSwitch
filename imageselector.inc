@@ -4,7 +4,7 @@
 
 procedure TPropertyImageSelector.DoShowEditor;
 var lv,i,j : integer;
-    FImages             : Array[0..29] of TCustomBitmap;
+    FImages             : Array[0..39] of TCustomBitmap;
 begin
  PEForm                := TForm.Create(Application);
  try
@@ -16,14 +16,23 @@ begin
   PEForm.Caption        := 'Select a image for a RollButton';
 
   FFirst := true;
-  FHigh := TFlexiSwitch(GetComponent(0)).FImagesCount;
-  for lv := 0 to FHigh do
+
+  for lv := 0 to 39 do
     FImages[lv] := TPortableNetworkGraphic.Create;
 
 
   FImages[0].LoadFromResourceName(HInstance,'off');
   FImages[1].LoadFromResourceName(HInstance,'ok');
-  //load more images, maximal 30
+  FImages[2].LoadFromResourceName(HInstance,'ok_1');
+  FImages[3].LoadFromResourceName(HInstance,'delete_1');
+  FImages[4].LoadFromResourceName(HInstance,'add4');
+  FImages[5].LoadFromResourceName(HInstance,'remove1');
+  FImages[6].LoadFromResourceName(HInstance,'ball1');
+  FImages[7].LoadFromResourceName(HInstance,'ball2');
+  //load more images, maximal 40  Images must have 72x72pixel!
+  FImages[8].LoadFromResourceName(HInstance,'dummy');
+  for lv := 9 to 39 do //load the rest with dummy
+   FImages[lv].Assign(FImages[8]);
 
   FRollImage            := TRollImage.Create;
   FRollImage.aDirection := TFlexiSwitch(GetComponent(0)).FDirection;
@@ -36,8 +45,7 @@ begin
     FThumbnail[lv].Left       := 20+(80*i);
     FThumbnail[lv].Top        := 20+(80*j);
     FThumbnail[lv].Tag        := lv;
-    if lv <= FHigh then
-     FThumbnail[lv].FImage     := FImages[lv];
+    FThumbnail[lv].FImage     := FImages[lv];
     FThumbNail[lv].OnClick    :=@SelectedImage;
     inc(i);
     if i > 7 then
@@ -79,7 +87,7 @@ begin
 
  Finally
    FRollImage.Free;
-   for lv := 0 to FHigh do FImages[lv].Free;
+   for lv := 0 to 39 do FImages[lv].Free;
    for lv := 0 to 9 do FThumbnail[lv].Free;
    PEForm.Free;
  end;

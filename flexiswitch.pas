@@ -1,3 +1,36 @@
+{ <TFlexiSwitch is a toggle component>
+  <Version 0.0.0.1>
+  Copyright (C) <03.12.2023> <Bernd Hübner>
+  Many thanks to the members of the German Lazarus Forum!
+  For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
+  The images in the resource are from Roland Hahn. Vielen Dank!
+  See: https://www.lazarusforum.de/viewtopic.php?p=128092#p128092
+
+  This library is free software; you can redistribute it and/or modify it under the
+  terms of the GNU Library General Public License as published by the Free Software
+  Foundation; either version 2 of the License, or (at your option) any later
+  version with the following modification:
+
+  As a special exception, the copyright holders of this library give you permission
+  to link this library with independent modules to produce an executable,
+  regardless of the license terms of these independent modules,and to copy and
+  distribute the resulting executable under terms of your choice, provided that you
+  also meet, for each linked independent module, the terms and conditions of the
+  license of that module. An independent module is a module which is not derived
+  from or based on this library. If you modify this library, you may extend this
+  exception to your version of the library, but you are not obligated to do so. If
+  you do not wish to do so, delete this exception statement from your version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE. See the GNU Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public License along
+  with this library; if not, write to the Free Software Foundation, Inc., 51
+  Franklin Street - Fifth Floor, Boston, MA 02110-1335, USA.
+}
+
+
 unit FlexiSwitch;
 
 {$mode ObjFPC}{$H+}
@@ -7,7 +40,7 @@ interface
 uses
   Classes, SysUtils, Math, LResources, Forms, Controls, Graphics, Dialogs,
   IntfGraphics, LCLIntf, GraphType, PropEdits, outsourced, ExtCtrls, LMessages,
-  LCLType, StdCtrls, LCLProc;
+  LCLType, StdCtrls;
 
 type
   TClickEvent      = procedure(Sender: TObject) of object;
@@ -59,8 +92,8 @@ type
    procedure MouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);override;
    procedure Paint; override;
 
-   property aColor : TColor read FAColor write SetAColor;
-   property OnClick      : TClickEvent read FOnClick     write FOnClick;
+   property aColor  : TColor read FAColor write SetAColor;
+   property OnClick : TClickEvent read FOnClick     write FOnClick;
   end;
 
 type
@@ -71,13 +104,12 @@ type
     private
      PEForm       : TCustomForm;
      FThumbnail   : array [0..39] of TThumbnail;
-     FHigh        : integer;
      FRadioButton : array [0..1] of TRadioButton;
      FButton      : array [0..1] of TButton;
      FRollImage   : TRollImage;
      FFirst       : boolean;
      procedure ButtonsClick(Sender: TObject);
-     procedure RadioButtons(Sender: TObject);
+     procedure RadioButtons({%H-}Sender: TObject);
      procedure SelectedImage(Sender: TObject);
     protected
      procedure DoShowEditor;
@@ -95,7 +127,8 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-   FImages             : Array[0..29] of TCustomBitmap;
+   FImages             : Array[0..39] of TCustomBitmap;
+   FImgSizeFactor      : double;
    FLeftImageIndex     : integer;
    FRightImage         : TCustomBitmap;
    FLeftImage          : TCustomBitmap;
@@ -137,7 +170,7 @@ type
    FHoverColor         : TColor;
    FHover              : boolean;
    FHoverBlendFaktor   : Double;
-   FLeftBgrdColor   : TColor;
+   FLeftBgrdColor      : TColor;
    FOldWidth           : integer;
    FOldHeight          : integer;
    FPortion            : Double;
@@ -148,7 +181,9 @@ type
    FBackgroundImage    : TCustomBitmap;
    FButtonImage        : TCustomBitmap;
    FBorderImage        : TCustomBitmap;
-   FImagesCount        : integer;
+   FLoadFromFile       : boolean;
+   FLeft               : integer;
+   FTop                : integer;
 
    procedure DrawAHoverEvent;
    procedure DrawFocused;
@@ -158,7 +193,8 @@ type
    procedure DrawTheButton;
    procedure DrawTheCaption;
    procedure DrawTheRollbutton;
-   procedure FTimerTimer(Sender: TObject);
+   procedure FontChange(Sender: TObject);
+   procedure FTimerTimer({%H-}Sender: TObject);
    function CalculateTextRect:TRect;
    procedure SetAlignment(AValue: TAlignment);
    procedure SetBestTextHeight(AValue: boolean);
@@ -168,6 +204,8 @@ type
    procedure SetCapTop(AValue: integer);
    procedure SetDirection(AValue: TDirection);
    procedure SetDisabledColor(AValue: TColor);
+   procedure SetEnabledBlendFaktor(AValue: Double);
+   procedure SetImgSizeFactor(AValue: double);
    procedure SetLeftImageIndex(AValue: integer);
    procedure SetRightBgrdColor(AValue: TColor);
    procedure SetRightCaption(AValue: TCaption);
@@ -184,6 +222,7 @@ type
    procedure SetEnabled(aValue: boolean);reintroduce;
 
   protected
+   procedure BoundsChanged;override;
    procedure CalculateBounds;
    procedure CalculateButton;
    procedure KeyPress(var Key: char);override;
@@ -203,17 +242,29 @@ type
    procedure LoadImagesfromFile(LeftFilename,RightFilename: string);
    procedure Paint; override;
 
+   //How translucent is the HoverColor (1=opaque,0=transparent)
+   //Wie transparent die Hoverfarbe ist (1=undurchsichtig,0=durchsichtig)
    property HoverBlendFaktor : Double read FHoverBlendFaktor write FHoverBlendFaktor;
+   //How translucent is the focusColor (1=opaque,0=transparent)
+   //Wie transparent die Fokusfarbe ist (1=undurchsichtig,0=durchsichtig)
    property FocusedBlendFaktor : Double read FFocusedBlendFaktor write FFocusedBlendFaktor;
+   //The Startangle of the RollImage
+   //Der Startwinkel des RollImages
    property Angel : Double read FAngel write FAngel;
+   //The steps by rotation
+   //Die Schritte beim Drehen
    property Rotation : Double read FRotation write FRotation;
+
    property TextStyle: TTextStyle read FTextStyle write SetTextStyle;
    //The colour of the control when enable := false
    //Die Farbe des Controlls wenn enable := false
    property DisabledColor : TColor read FDisabledColor write SetDisabledColor;
    //How translucent is the DisabledColor (1=opaque,0=transparent)
    //Wie transparent die DisabledColor ist (1=undurchsichtig,0=durchsichtig)
-   property EnabledBlendFaktor : Double read FEnabledBlendFaktor write FEnabledBlendFaktor;
+   property EnabledBlendFaktor : Double read FEnabledBlendFaktor write SetEnabledBlendFaktor;
+   //
+   //
+   property ImgSizeFactor : double read FImgSizeFactor write SetImgSizeFactor;
 
   published
    //The Left background colour
@@ -222,8 +273,8 @@ type
    //The Right background colour
    //Die rechte Hintergrundfarbe
    property RightBgrdColor : TColor read FRightBgrdColor write SetRightBgrdColor default $0000C800;
-   //The color of the button
-   //Die Farbe des Buttons
+   //The color of the button, Rollimage only visible when ButtonColor = clNone
+   //Die Farbe des Buttons, Rollimages sind nur sichtbar wenn ButtonColor = clNone
    property ButtonColor : TColor read FButtonColor write SetButtonColor default clNone;
    //The color of the border (clNone = no Border)
    //Farbe des Randes (clNone = keinRand)
@@ -231,8 +282,8 @@ type
    //The color of a hoverevent (clNone = no hover)
    //Die Farbe eines Hoverereignisses (clNone = kein Hover)
    property HoverColor : TColor read FHoverColor write SetHoverColor default clNone;
-   //The color when the Control has the focus
-   //Die Farbe wenn das Control den Fokus hat
+   //The color when the Control has the focus (clNone = no focus is shown)
+   //Die Farbe wenn das Control den Fokus hat (clNone = keine Fokus-Anzeige)
    property FocusColor : TColor read FFocusColor write SetFocusColor default clRed;
    //Determines whether the RollButton(Image) rotates
    //Bestimmt ob sich der RollButton(Image) dreht
@@ -270,13 +321,16 @@ type
    //Automatically adjusts the text height to the size of the control
    //Passt die Texthöhe automatisch der Größe des Controlls an
    property BestTextHeight : boolean read FBestTextHeight write SetBestTextHeight default true;
-
+   //Starts the property editor to select loaded images
+   //Startet den Eigenschaftseditor um geladene Images auszuwählen
    property NewRollImage : TRollImage read FRollImage write SetRollImage;
-
+   //The Index of the loaded left image
+   //Der Index des linken geladenen Bildes
    property LeftImageIndex : integer read FLeftImageIndex write SetLeftImageIndex default 0;
-
-
+   //The Index of the loaded right image
+   //Der Index des rechten geladenen Bildes
    property RightImageIndex : integer read FRightImageIndex write SetRightImageIndex default 1;
+
 
 
 
@@ -323,7 +377,7 @@ procedure Register;
 begin
   {$I flexiswitch_icon.lrs}
   RegisterComponents('Misc',[TFlexiSwitch]);
-  RegisterPropertyEditor(TypeInfo(TRollImage),nil,'NewRollImage',TPropertyImageSelector); //Hier RollImage muss identisch mit der Property sein
+  RegisterPropertyEditor(TypeInfo(TRollImage),nil,'NewRollImage',TPropertyImageSelector); //Hier "RollImage" muss identisch mit der Property sein
   {$R images.res}
 end;
 
@@ -347,7 +401,7 @@ begin
   FRotation            := 30;
   FDirection           := fsLeft;
   FEnabled             := true;
-  FLeftBgrdColor    := rgb(200,0,0);
+  FLeftBgrdColor       := rgb(200,0,0);
   FRightBgrdColor      := rgb(0,200,0);
   FButtonColor         := clNone;
   FBorderColor         := clNone;
@@ -358,6 +412,10 @@ begin
   FFocusColor          := clRed;
   FBestTextHeight      := true;
   TabStop              := true;
+  FLoadFromFile        := false;
+  FImgSizeFactor       :=   1;
+  FLeft                :=   0;
+  FTop                 :=   0;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -365,12 +423,13 @@ begin
   FTimer.Enabled    := false;
   FTimer.OnTimer    :=@FTimerTimer;
 
-  FLeftCaption   := 'OFF';
+  FLeftCaption      := 'OFF';
   FRightCaption     := 'ON';
   FCaption          := FLeftCaption;
   FFont             := TFont.Create;
   FFont.Color       := clWhite;
   FFont.Style       := [fsbold];
+  FFont.OnChange    :=@FontChange;
 
   FTextStyle.Alignment := taCenter;
   FTextStyle.Layout    := tlCenter;
@@ -391,9 +450,17 @@ begin
     FImages[lv] := TPortableNetworkGraphic.Create;
   FImages[0].LoadFromResourceName(HInstance,'off');
   FImages[1].LoadFromResourceName(HInstance,'ok');
-  //load more images, maximal 30
+  FImages[2].LoadFromResourceName(HInstance,'ok_1');
+  FImages[3].LoadFromResourceName(HInstance,'delete_1');
+  FImages[4].LoadFromResourceName(HInstance,'add4');
+  FImages[5].LoadFromResourceName(HInstance,'remove1');
+  FImages[6].LoadFromResourceName(HInstance,'ball1');
+  FImages[7].LoadFromResourceName(HInstance,'ball2');
+  //load more images, maximal 40   Images must have 72x72pixel!
+  FImages[8].LoadFromResourceName(HInstance,'dummy');
+  for lv := 9 to 39 do //load the rest with dummy
+   FImages[lv].Assign(FImages[8]);
 
-  FImagesCount := High(FImages);
   FLeftImage := TPortableNetworkGraphic.Create;
   FLeftImage.Assign(FImages[FLeftImageIndex]);
   FRightImage := TPortableNetworkGraphic.Create;
@@ -500,7 +567,7 @@ begin
        FLeftImage.Assign(oldiniimg);
        FRightImage.Assign(oldRightimg);
        showmessage('The size of the images must be the same!');
-      end;
+      end else FLoadFromFile := true;
     end
    else
     begin
@@ -555,7 +622,13 @@ begin
  Factor       := (i * 100) / 26;
  FMargin      := round((Height / 100) * Factor);
 
- FButtonSize := Height - (2 * FMargin);
+ FButtonSize := round((Height - (2 * FMargin)) * FImgSizeFactor);
+ if FLoadFromFile then
+  begin
+   i := (Height - FButtonSize) div 2;
+   FLeft          :=   i-FMargin;
+   FTop           :=   i-FMargin;
+  end;
 end;
 
 procedure TFlexiSwitch.KeyPress(var Key: char);
@@ -590,7 +663,6 @@ begin
                          if Assigned(OnChange) then OnChange(self);
                         end;
                       Invalidate;
-                      //if FGroupIndex <> 0 then CheckTheGroup;
                      end
 
       else begin
@@ -726,6 +798,7 @@ procedure TFlexiSwitch.DrawFocused;
 var TmpBmp            : TBitmap;
     TempImg1,TempImg2 : TLazIntfImage;
 begin
+ if FFocusColor = clNone then exit;
  if Focused then
   if FEnabled then
   begin
@@ -794,7 +867,9 @@ begin
     TmpBmp.Assign(TempImg3);
     if (FDirection = fsRight) and not FTimer.Enabled then
      FRollPos := width - (FButtonSize + (2*FMargin));
-    Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
+    if FLoadFromFile and (FDirection = fsRight) and not FTimer.Enabled then
+     FLeft := FLeft * -1 else FLeft := FTop;
+    Canvas.Draw(FLeft+FMargin+FRollPos,FTop+FMargin,TmpBmp);
    Finally
     TempImg1.Free;
     TempImg2.Free;
@@ -802,6 +877,11 @@ begin
     TmpBmp.Free;
    end;
  end;
+end;
+
+procedure TFlexiSwitch.FontChange(Sender: TObject);
+begin
+  Invalidate;
 end;
 
 procedure TFlexiSwitch.DrawTheCaption;
@@ -871,13 +951,13 @@ procedure TFlexiSwitch.Paint;
 begin
  CalculateBounds;
 
+ CalculateButton;
+
  DrawTheBackground;
 
  DrawTheBorder;
 
  DrawFocused;
-
- CalculateButton;
 
  DrawTheButton;
 
