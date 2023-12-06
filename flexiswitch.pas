@@ -40,7 +40,7 @@ interface
 uses
   Classes, SysUtils, Math, LResources, Forms, Controls, Graphics, Dialogs,
   IntfGraphics, LCLIntf, GraphType, PropEdits, outsourced, ExtCtrls, LMessages,
-  LCLType, StdCtrls;
+  LCLType, StdCtrls, LCLProc;
 
 type
   TClickEvent      = procedure(Sender: TObject) of object;
@@ -62,6 +62,9 @@ type
 
 type
   TDirection = (fsRight,fsLeft);
+
+type
+  TSwitchMode = (fsClick,fsSlide);
 
 type
   TRollImage = class (TPersistent)
@@ -129,9 +132,9 @@ type
   private
    FImages             : Array[0..39] of TCustomBitmap;
    FImgSizeFactor      : double;
-   FLeftImageIndex     : integer;
+   FImgLeftImageIndex     : integer;
    FRightImage         : TCustomBitmap;
-   FLeftImage          : TCustomBitmap;
+   FImgLeftImage          : TCustomBitmap;
    FFocusColor         : TColor;
    FBestTextHeight     : boolean;
    FFocusedBlendFaktor : Double;
@@ -162,6 +165,7 @@ type
    FRollImage          : TRollImage;
    FRotation           : Double;
    FSpeed              : integer;
+   FSwitchMode         : TSwitchMode;
    FTextStyle          : TTextStyle;
    FTimer              : TTimer;
    FBorderColor        : TColor;
@@ -170,7 +174,7 @@ type
    FHoverColor         : TColor;
    FHover              : boolean;
    FHoverBlendFaktor   : Double;
-   FLeftBgrdColor      : TColor;
+   FImgLeftBgrdColor      : TColor;
    FOldWidth           : integer;
    FOldHeight          : integer;
    FPortion            : Double;
@@ -182,8 +186,16 @@ type
    FButtonImage        : TCustomBitmap;
    FBorderImage        : TCustomBitmap;
    FLoadFromFile       : boolean;
-   FLeft               : integer;
-   FTop                : integer;
+   FImgLeft            : integer;
+   FImgTop             : integer;
+   FHotSpot            : TRect;
+   FOldCursor          : TCursor;
+   FFlexiCursor        : TCursor;
+   FSlideFirst         : boolean;
+   FSlideStartX        : integer;
+   FSlideEndPos        : boolean;
+   FFirst              : boolean;
+   FFirstRight         : boolean;
 
    procedure DrawAHoverEvent;
    procedure DrawFocused;
@@ -220,6 +232,7 @@ type
    procedure SetSpeed(AValue: integer);
    procedure SetTextStyle(AValue: TTextStyle);
    procedure SetEnabled(aValue: boolean);reintroduce;
+   procedure SlideTheButton(aX: integer);
 
   protected
    procedure BoundsChanged;override;
@@ -234,6 +247,7 @@ type
   public
    constructor Create(AOwner: TComponent); override;
    destructor  Destroy; override;
+   procedure Loaded; override;
    procedure MouseEnter; override;
    procedure MouseLeave; override;
    procedure MouseMove({%H-}Shift: TShiftState; X, Y: Integer);override;
@@ -269,7 +283,7 @@ type
   published
    //The Left background colour
    //Die linke Hintergrundfarbe
-   property LeftBgrdColor : TColor read FLeftBgrdColor write SetLeftBgrdColor default $000000C8;
+   property LeftBgrdColor : TColor read FImgLeftBgrdColor write SetLeftBgrdColor default $000000C8;
    //The Right background colour
    //Die rechte Hintergrundfarbe
    property RightBgrdColor : TColor read FRightBgrdColor write SetRightBgrdColor default $0000C800;
@@ -326,10 +340,13 @@ type
    property NewRollImage : TRollImage read FRollImage write SetRollImage;
    //The Index of the loaded left image
    //Der Index des linken geladenen Bildes
-   property LeftImageIndex : integer read FLeftImageIndex write SetLeftImageIndex default 0;
+   property LeftImageIndex : integer read FImgLeftImageIndex write SetLeftImageIndex default 0;
    //The Index of the loaded right image
    //Der Index des rechten geladenen Bildes
    property RightImageIndex : integer read FRightImageIndex write SetRightImageIndex default 1;
+   //
+   //
+   property SwitchMode : TSwitchMode read FSwitchMode write FSwitchMode default fsClick;
 
 
 
@@ -401,7 +418,7 @@ begin
   FRotation            := 30;
   FDirection           := fsLeft;
   FEnabled             := true;
-  FLeftBgrdColor       := rgb(200,0,0);
+  FImgLeftBgrdColor    := rgb(200,0,0);
   FRightBgrdColor      := rgb(0,200,0);
   FButtonColor         := clNone;
   FBorderColor         := clNone;
@@ -414,8 +431,13 @@ begin
   TabStop              := true;
   FLoadFromFile        := false;
   FImgSizeFactor       :=   1;
-  FLeft                :=   0;
-  FTop                 :=   0;
+  FImgLeft             :=   0;
+  FImgTop              :=   0;
+  FSwitchMode          := fsClick;
+  FSlideFirst          := true;
+  FSlideEndPos         := true;
+  FFirst               := true;
+  FFirstRight          := false;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -444,7 +466,7 @@ begin
   FBorderImage := TPortableNetworkGraphic.Create;
   FBorderImage.LoadFromResourceName(HInstance,'border');
 
-  FLeftImageIndex  := 0;
+  FImgLeftImageIndex  := 0;
   FRightImageIndex := 1;
   for lv := 0 to High(FImages) do
     FImages[lv] := TPortableNetworkGraphic.Create;
@@ -461,8 +483,8 @@ begin
   for lv := 9 to 39 do //load the rest with dummy
    FImages[lv].Assign(FImages[8]);
 
-  FLeftImage := TPortableNetworkGraphic.Create;
-  FLeftImage.Assign(FImages[FLeftImageIndex]);
+  FImgLeftImage := TPortableNetworkGraphic.Create;
+  FImgLeftImage.Assign(FImages[FImgLeftImageIndex]);
   FRightImage := TPortableNetworkGraphic.Create;
   FRightImage.Assign(FImages[FRightImageIndex]);
 
@@ -478,7 +500,7 @@ begin
  FBackgroundImage.Free;
  FButtonImage.Free;
  FBorderImage.Free;
- FLeftImage.Free;
+ FImgLeftImage.Free;
  FRightImage.Free;
  for lv := 0 to High(FImages) do FImages[lv].Free;
  FTimer.Free;
@@ -486,11 +508,25 @@ begin
  inherited Destroy;
 end;
 
+procedure TFlexiSwitch.Loaded;
+begin
+ inherited Loaded;
+ FFlexiCursor := Cursor;
+ if (FDirection = fsRight) then
+  begin
+   CalculateBounds;
+   CalculateButton;
+   FRollPos := width - (FButtonSize + (2*FMargin));
+
+  end;
+end;
+
 procedure TFlexiSwitch.MouseEnter;
 begin
  if not Enabled then exit;
  inherited MouseEnter;
  FHover := true;
+ FOldCursor := Cursor;
  if Assigned(OnMouseEnter) then OnMouseEnter(self);
  Invalidate;
 end;
@@ -500,16 +536,45 @@ begin
  if not Enabled then exit;
  inherited MouseLeave;
  FHover := false;
+ Cursor := FOldCursor;
  if Assigned(OnMouseLeave) then OnMouseLeave(self);
+ if not FSlideEndPos and (FTimer.Enabled = false) then
+  FTimer.Enabled:= true;
  Invalidate;
 end;
 
 procedure TFlexiSwitch.MouseMove(Shift: TShiftState; X, Y: Integer);
+var delta : integer;
 begin
  if not Enabled then exit;
  inherited MouseMove(Shift, X, Y);
  if Assigned(OnMouseMove) then OnMouseMove(self,Shift,x,y);
- //FHover := true;
+ Cursor := FFlexiCursor;
+
+ if FSwitchMode = fsSlide then
+  begin
+   if PointInaCircle(FHotSpot,x,y) then
+    begin
+     Cursor:=crHandPoint;
+     if ssLeft in Shift then
+      begin
+       if FSlideFirst then
+        FSlideStartX := x;
+       FSlideFirst := false;
+       delta := x-FSlideStartX;
+       if FFirstRight then
+        begin
+         FSlideStartX := x-FRollPos;
+         delta := x-FSlideStartX;
+         FFirstRight := false;
+        end;
+       SlideTheButton(delta);
+      end;
+    end;
+   Invalidate;
+   exit;
+  end;
+ FSlideFirst := true;
  Invalidate;
 end;
 
@@ -530,9 +595,14 @@ begin
  inherited MouseUp(Button, Shift, X, Y);
  if Assigned(OnMouseUp) then OnMouseUp(self,Button,Shift,x,y);
  if Assigned(OnClick) then OnClick(self);
+
+ if FSwitchMode = fsSlide then
+  if not FSlideEndPos and (FTimer.Enabled = false) then
+   FTimer.Enabled:= true;
+
+ if FSwitchMode = fsClick then
   if not FTimer.Enabled then
    begin
-    //if FDirection = fsRight then FDirection := fsLeft else FDirection := fsRight;
     FDirection := TDirection((ord(FDirection) + 1) mod 2);
     FTimer.Enabled:= true;
     if Assigned(OnChange) then OnChange(self);
@@ -545,33 +615,33 @@ begin
  oldiniimg   :=TPortableNetworkGraphic.Create;
  oldRightimg :=TPortableNetworkGraphic.Create;
  try
-  if assigned(FLeftImage) then
+  if assigned(FImgLeftImage) then
    begin
-    oldiniimg.Assign(FLeftImage);
-    FreeAndNil(FLeftImage);
+    oldiniimg.Assign(FImgLeftImage);
+    FreeAndNil(FImgLeftImage);
    end;
   if assigned(FRightImage)   then
    begin
     oldRightimg.Assign(FRightImage);
     FreeAndNil(FRightImage);
    end;
- FLeftImage := TPortableNetworkGraphic.Create;
+ FImgLeftImage := TPortableNetworkGraphic.Create;
  FRightImage   := TPortableNetworkGraphic.Create;
   try
    if fileexists(LeftFilename) and fileexists(RightFilename) then
     begin
-     FLeftImage.LoadFromFile(LeftFilename);
+     FImgLeftImage.LoadFromFile(LeftFilename);
      FRightImage.LoadFromFile(RightFilename);
-     if (FLeftImage.Width <> FRightImage.Width) or (FLeftImage.Height <> FRightImage.Height) then
+     if (FImgLeftImage.Width <> FRightImage.Width) or (FImgLeftImage.Height <> FRightImage.Height) then
       begin
-       FLeftImage.Assign(oldiniimg);
+       FImgLeftImage.Assign(oldiniimg);
        FRightImage.Assign(oldRightimg);
        showmessage('The size of the images must be the same!');
       end else FLoadFromFile := true;
     end
    else
     begin
-     FLeftImage.Assign(oldiniimg);
+     FImgLeftImage.Assign(oldiniimg);
      FRightImage.Assign(oldRightimg);
      showmessage('Incorrect path');
     end;
@@ -623,11 +693,12 @@ begin
  FMargin      := round((Height / 100) * Factor);
 
  FButtonSize := round((Height - (2 * FMargin)) * FImgSizeFactor);
+
  if FLoadFromFile then
   begin
    i := (Height - FButtonSize) div 2;
-   FLeft          :=   i-FMargin;
-   FTop           :=   i-FMargin;
+   FImgLeft          :=   i-FMargin;
+   FImgTop           :=   i-FMargin;
   end;
 end;
 
@@ -686,6 +757,47 @@ begin
  if Assigned(OnEnter) then OnEnter(self);
 end;
 
+procedure TFlexiSwitch.SlideTheButton(aX: integer);
+var l : integer;
+    f : double;
+begin
+ l        := width - Height;
+
+ if (aX > (l-round(l*0.1))) and (FDirection=fsLeft) then
+  begin
+   FDirection := fsRight;
+   FPortion   := 1;
+   FRollPos   := width - (FButtonSize + (2*FMargin));
+   FCaption   := FRightCaption;
+   FAngel     := 360;
+   FSlideEndPos := true;
+   Invalidate;
+   if Assigned(OnChange) then OnChange(self);
+   exit;
+  end;
+
+ if (aX < (round(l*0.1))) and (FDirection=fsRight) then
+  begin
+   FDirection := fsLeft;
+   FPortion   := 0;
+   FRollPos   := 0;
+   FCaption   := FLeftCaption;
+   FAngel     := 0;
+   FSlideEndPos := true;
+   Invalidate;
+   if Assigned(OnChange) then OnChange(self);
+   exit;
+  end;
+
+ if aX >= (l-round(l*0.1)) then exit;
+ if aX <= (round(l*0.1)) then exit;
+ FCaption := '';
+ FSlideEndPos := false;
+ f         := (aX * 100) / l;
+ FPortion  := (1/100)*f;
+ FRollPos  := aX;
+ FAngel    := (360/100)*f;
+end;
 
 procedure TFlexiSwitch.FTimerTimer(Sender: TObject);
 var l,l1 : integer;
@@ -706,6 +818,8 @@ begin
       FTimer.Enabled:= false;
       FRollPos := width - (FButtonSize + (2*FMargin));
       FCaption := FRightCaption;
+      FAngel := 360;
+      FSlideEndPos := true;
      end;
    end;
    if FDirection = fsLeft then
@@ -720,6 +834,8 @@ begin
       FTimer.Enabled:= false;
       FRollPos := 0 ;
       FCaption := FLeftCaption;
+      FAngel := 0;
+      FSlideEndPos := true;
      end;
    end;
    Invalidate;
@@ -746,14 +862,14 @@ procedure TFlexiSwitch.DrawTheBackground;
 var TmpBmp                     : TBitmap;
     TempImg1,TempImg2,TempImg3 : TLazIntfImage;
 begin
- if (FLeftBgrdColor <> clNone) and (FRightBgrdColor <> clNone) then
+ if (FImgLeftBgrdColor <> clNone) and (FRightBgrdColor <> clNone) then
   begin
    TempImg1 := FBackgroundImage.CreateIntfImage;
    TempImg2 := FBackgroundImage.CreateIntfImage;
    TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TmpBmp  := TBitmap.Create;
    try
-    ChangeColor(TempImg1,FLeftBgrdColor);
+    ChangeColor(TempImg1,FImgLeftBgrdColor);
     ChangeColor(TempImg2,FRightBgrdColor);
     BlendImages(TempImg1,TempImg2,FPortion);
     TempImg3.SetSize(Width,Height);
@@ -838,6 +954,7 @@ begin
     TmpBmp.PixelFormat:= pf32Bit;
     TmpBmp.Assign(TempImg2);
     Canvas.Draw(FMargin+FRollPos,FMargin,TmpBmp);
+    FHotspot := rect(FMargin+FRollPos,FMargin,FMargin+FRollPos+FButtonSize,FMargin+FButtonSize);
    Finally
     TempImg1.Free;
     TempImg2.Free;
@@ -851,9 +968,9 @@ var TmpBmp                     : TBitmap;
     TempImg1,TempImg2,TempImg3 : TLazIntfImage;
 begin
  if FButtonColor = clNone then
- if assigned(FLeftImage) and assigned(FRightImage) then
+ if assigned(FImgLeftImage) and assigned(FRightImage) then
   begin
-   TempImg1 := FLeftImage.CreateIntfImage;
+   TempImg1 := FImgLeftImage.CreateIntfImage;
    TempImg2 := FRightImage.CreateIntfImage;
    TempImg3 := TLazIntfImage.Create(0,0, [riqfRGB, riqfAlpha]);
    TmpBmp   := TBitmap.Create;
@@ -865,11 +982,20 @@ begin
     TempImg3.SetSize(FButtonSize,FButtonSize);
     StretchDrawImgToImg(TempImg1,TempImg3,FButtonSize,FButtonSize);
     TmpBmp.Assign(TempImg3);
-    if (FDirection = fsRight) and not FTimer.Enabled then
-     FRollPos := width - (FButtonSize + (2*FMargin));
+    (*
+    if FFirst then
+     begin
+      if (FDirection = fsRight) and not FTimer.Enabled then
+       FRollPos := width - (FButtonSize + (2*FMargin));
+      FFirst := false;
+     end;
+     *)
+
     if FLoadFromFile and (FDirection = fsRight) and not FTimer.Enabled then
-     FLeft := FLeft * -1 else FLeft := FTop;
-    Canvas.Draw(FLeft+FMargin+FRollPos,FTop+FMargin,TmpBmp);
+     FImgLeft := FImgLeft * -1 else FImgLeft := FImgTop;
+    Canvas.Draw(FImgLeft+FMargin+FRollPos,FImgTop+FMargin,TmpBmp);
+    FHotspot := rect(FImgLeft+FMargin+FRollPos,FImgTop+FMargin,
+                     FImgLeft+FMargin+FRollPos+FButtonSize,FImgTop+FMargin+FButtonSize);
    Finally
     TempImg1.Free;
     TempImg2.Free;

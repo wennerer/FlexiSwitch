@@ -67,16 +67,17 @@ begin
   if AValue = fsLeft then
    begin
     FPortion := 0;
-    FAngel := 0;
+    FAngel   := 0;
     FRollPos := 0;
     FCaption := FLeftCaption;
    end
    else
    begin
-    FPortion:= 1;
-    FAngel :=  360;
-    FRollPos := width - (FButtonSize + (2*FMargin));
-    FCaption := FRightCaption;
+    FPortion    := 1;
+    FAngel      :=  360;
+    FRollPos    := width - (FButtonSize + (2*FMargin));
+    FCaption    := FRightCaption;
+    FFirstRight := true;
    end;
   Invalidate;
 end;
@@ -108,23 +109,23 @@ begin
   if FLoadFromFile then
    begin
     FLoadFromFile := false;
-    if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+    if assigned(FImgLeftImage) then FreeAndNil(FImgLeftImage);
     if assigned(FRightImage) then FreeAndNil(FRightImage);
     FRightImage := TPortableNetworkGraphic.Create;
     FRightImage.Assign(FImages[1]);
-    FLeftImage := TPortableNetworkGraphic.Create;
-    FLeftImage.Assign(FImages[0]);
+    FImgLeftImage := TPortableNetworkGraphic.Create;
+    FImgLeftImage.Assign(FImages[0]);
     FImgSizeFactor := 1;
-    FLeft          := 0;
-    FTop           := 0;
+    FImgLeft          := 0;
+    FImgTop           := 0;
    end;
-  if FLeftImageIndex=AValue then Exit;
+  if FImgLeftImageIndex=AValue then Exit;
   if aValue < 0 then aValue := 0;
   if aValue > High(FImages) then aValue := High(FImages);
-  FLeftImageIndex:=AValue;
-  if assigned(FLeftImage) then FreeAndNil(FLeftImage);
-  FLeftImage := TPortableNetworkGraphic.Create;
-  FLeftImage.Assign(FImages[FLeftImageIndex]);
+  FImgLeftImageIndex:=AValue;
+  if assigned(FImgLeftImage) then FreeAndNil(FImgLeftImage);
+  FImgLeftImage := TPortableNetworkGraphic.Create;
+  FImgLeftImage.Assign(FImages[FImgLeftImageIndex]);
   Invalidate;
 end;
 
@@ -139,9 +140,9 @@ end;
 
 procedure TFlexiSwitch.SetLeftBgrdColor(AValue: TColor);
 begin
-  if FLeftBgrdColor=AValue then Exit;
-  if aValue = clNone then FLeftBgrdColor:= clNone else
-  FLeftBgrdColor:=System_ToRGB(AValue);
+  if FImgLeftBgrdColor=AValue then Exit;
+  if aValue = clNone then FImgLeftBgrdColor:= clNone else
+  FImgLeftBgrdColor:=System_ToRGB(AValue);
   Invalidate;
 end;
 
@@ -167,15 +168,15 @@ begin
   if FLoadFromFile then
    begin
     FLoadFromFile := false;
-    if assigned(FLeftImage) then FreeAndNil(FLeftImage);
+    if assigned(FImgLeftImage) then FreeAndNil(FImgLeftImage);
     if assigned(FRightImage) then FreeAndNil(FRightImage);
     FRightImage := TPortableNetworkGraphic.Create;
     FRightImage.Assign(FImages[1]);
-    FLeftImage := TPortableNetworkGraphic.Create;
-    FLeftImage.Assign(FImages[0]);
+    FImgLeftImage := TPortableNetworkGraphic.Create;
+    FImgLeftImage.Assign(FImages[0]);
     FImgSizeFactor := 1;
-    FLeft          := 0;
-    FTop           := 0;
+    FImgLeft          := 0;
+    FImgTop           := 0;
    end;
   if FRightImageIndex=AValue then Exit;
   if aValue < 0 then aValue := 0;
@@ -198,10 +199,10 @@ begin
 
  if aValue.aDirection = fsLeft then
   begin
-   if assigned(FLeftImage) then FreeAndNil(FLeftImage);
-   FLeftImage := TPortableNetworkGraphic.Create;
-   FLeftImage.Assign(FImages[aValue.ImageIndex]);
-   FLeftImageIndex := aValue.ImageIndex;
+   if assigned(FImgLeftImage) then FreeAndNil(FImgLeftImage);
+   FImgLeftImage := TPortableNetworkGraphic.Create;
+   FImgLeftImage.Assign(FImages[aValue.ImageIndex]);
+   FImgLeftImageIndex := aValue.ImageIndex;
   end;
  if aValue.aDirection = fsRight then
   begin
