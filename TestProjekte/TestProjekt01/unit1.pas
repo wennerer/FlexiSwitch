@@ -24,6 +24,7 @@ type
     ColorBox5: TColorBox;
     ColorBox6: TColorBox;
     ColorBox7: TColorBox;
+    SwitchMode: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
     FlexiSwitch1: TFlexiSwitch;
@@ -84,6 +85,7 @@ type
     procedure SpinEdit2Change(Sender: TObject);
     procedure SpinEdit3Change(Sender: TObject);
     procedure SpinEdit4Change(Sender: TObject);
+    procedure SwitchModeChange(Sender: TObject);
     procedure TrackBar1Change(Sender: TObject);
   private
 
@@ -221,6 +223,14 @@ end;
 procedure TForm1.SpinEdit4Change(Sender: TObject);
 begin
  aFlexiSwitch.Font.Height:=SpinEdit4.Value;
+end;
+
+procedure TForm1.SwitchModeChange(Sender: TObject);
+begin
+ case SwitchMode.ItemIndex of
+  0: aFlexiSwitch.SwitchMode:= fsClick;
+  1: aFlexiSwitch.SwitchMode:= fsSlide;
+ end;
 end;
 
 end.

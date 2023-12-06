@@ -547,4 +547,18 @@ object Form1: TForm1
     ParentFont = False
     TabOrder = 48
   end
+  object SwitchMode: TComboBox
+    Left = 584
+    Height = 27
+    Top = 384
+    Width = 170
+    ItemHeight = 0
+    Items.Strings = (
+      'fsClick'
+      'fsSlide'
+    )
+    OnChange = SwitchModeChange
+    TabOrder = 49
+    Text = 'SwitchMode'
+  end
 end
