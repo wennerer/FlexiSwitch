@@ -97,6 +97,12 @@ begin
   Invalidate;
 end;
 
+procedure TFlexiSwitch.SetGroupIndex(AValue: integer);
+begin
+  if FGRoupIndex=AValue then Exit;
+  FGRoupIndex:=AValue;
+end;
+
 procedure TFlexiSwitch.SetImgSizeFactor(AValue: double);
 begin
   if FImgSizeFactor=AValue then Exit;

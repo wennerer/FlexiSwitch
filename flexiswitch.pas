@@ -1,6 +1,6 @@
 { <TFlexiSwitch is a toggle component>
   <Version 0.0.0.1>
-  Copyright (C) <03.12.2023> <Bernd Hübner>
+  Copyright (C) <07.12.2023> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
   The images in the resource are from Roland Hahn. Vielen Dank!
@@ -132,9 +132,10 @@ type
   private
    FImages             : Array[0..39] of TCustomBitmap;
    FImgSizeFactor      : double;
-   FImgLeftImageIndex     : integer;
+   FGRoupIndex         : integer;
+   FImgLeftImageIndex  : integer;
    FRightImage         : TCustomBitmap;
-   FImgLeftImage          : TCustomBitmap;
+   FImgLeftImage       : TCustomBitmap;
    FFocusColor         : TColor;
    FBestTextHeight     : boolean;
    FFocusedBlendFaktor : Double;
@@ -174,7 +175,7 @@ type
    FHoverColor         : TColor;
    FHover              : boolean;
    FHoverBlendFaktor   : Double;
-   FImgLeftBgrdColor      : TColor;
+   FImgLeftBgrdColor   : TColor;
    FOldWidth           : integer;
    FOldHeight          : integer;
    FPortion            : Double;
@@ -197,6 +198,7 @@ type
    FFirst              : boolean;
    FFirstRight         : boolean;
 
+   procedure CheckTheGroup;
    procedure DrawAHoverEvent;
    procedure DrawFocused;
    procedure DrawNotEnabled;
@@ -217,6 +219,7 @@ type
    procedure SetDirection(AValue: TDirection);
    procedure SetDisabledColor(AValue: TColor);
    procedure SetEnabledBlendFaktor(AValue: Double);
+   procedure SetGroupIndex(AValue: integer);
    procedure SetImgSizeFactor(AValue: double);
    procedure SetLeftImageIndex(AValue: integer);
    procedure SetRightBgrdColor(AValue: TColor);
@@ -276,8 +279,8 @@ type
    //How translucent is the DisabledColor (1=opaque,0=transparent)
    //Wie transparent die DisabledColor ist (1=undurchsichtig,0=durchsichtig)
    property EnabledBlendFaktor : Double read FEnabledBlendFaktor write SetEnabledBlendFaktor;
-   //
-   //
+   //To compensate if images with <>72px are loaded with LoadfromFile
+   //Zum Ausgleich wenn mit LoadfromFile Images mit <>72px geladen werden
    property ImgSizeFactor : double read FImgSizeFactor write SetImgSizeFactor;
 
   published
@@ -344,10 +347,12 @@ type
    //The Index of the loaded right image
    //Der Index des rechten geladenen Bildes
    property RightImageIndex : integer read FRightImageIndex write SetRightImageIndex default 1;
-   //
-   //
+   //The mode with which the switch is operated, click or slide
+   //Der Modus mit dem der Schalter betätigt wird, klicken oder schieben
    property SwitchMode : TSwitchMode read FSwitchMode write FSwitchMode default fsClick;
-
+   //The Index within the group of FlexiSwitches, odd index allows only 1x fsRight, even 1x fsLeft
+   //Der Index der Gruppe zu der der FlexiSwitch gehört, ungerader Index erlaubt nur 1x fsRight, gerade 1x fsLeft
+   property GroupIndex : integer read FGroupIndex write SetGroupIndex default 0;
 
 
 
@@ -438,6 +443,7 @@ begin
   FSlideEndPos         := true;
   FFirst               := true;
   FFirstRight          := false;
+  FGRoupIndex          :=   0;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -511,7 +517,7 @@ end;
 procedure TFlexiSwitch.Loaded;
 begin
  inherited Loaded;
- FFlexiCursor := Cursor;
+ FFlexiCursor    := Cursor;
  if (FDirection = fsRight) then
   begin
    CalculateBounds;
@@ -656,6 +662,42 @@ begin
  Invalidate;
 end;
 
+procedure TFlexiSwitch.CheckTheGroup;
+var comp        : TComponent;
+    CurSwitch   : TFlexiSwitch;
+    CurForm     : TForm;
+    CurControl  : TControl;
+    lv          : integer;
+    exitflag    : boolean;
+begin
+ lv:=0; exitflag := false;
+ CurControl := Parent;
+ repeat
+  if CurControl is TForm then exitflag := true
+   else
+    CurControl := CurControl.Parent;      //back to the Form
+  inc(lv);
+ until (lv =100) or (exitflag = true);
+
+ CurForm := (CurControl as TForm);
+ for comp in CurForm do
+   begin
+    if comp is TFlexiSwitch then
+     begin
+      CurSwitch := comp as TFlexiSwitch;
+      if CurSwitch.GroupIndex <> 0 then
+       if (CurSwitch <> self) and (CurSwitch.GroupIndex = FGroupIndex) then
+        begin
+         if odd(CurSwitch.GroupIndex) then
+          CurSwitch.Direction:= fsLeft
+         else
+          CurSwitch.Direction:= fsRight;
+         CurSwitch.invalidate;
+        end;
+     end;//comp is
+   end;//comp in
+end;
+
 procedure TFlexiSwitch.CalculateBounds;
 var Factor : double;
 begin
@@ -772,6 +814,7 @@ begin
    FAngel     := 360;
    FSlideEndPos := true;
    Invalidate;
+   CheckTheGroup;
    if Assigned(OnChange) then OnChange(self);
    exit;
   end;
@@ -785,6 +828,7 @@ begin
    FAngel     := 0;
    FSlideEndPos := true;
    Invalidate;
+   CheckTheGroup;
    if Assigned(OnChange) then OnChange(self);
    exit;
   end;
@@ -820,6 +864,7 @@ begin
       FCaption := FRightCaption;
       FAngel := 360;
       FSlideEndPos := true;
+      CheckTheGroup;
      end;
    end;
    if FDirection = fsLeft then
@@ -836,6 +881,7 @@ begin
       FCaption := FLeftCaption;
       FAngel := 0;
       FSlideEndPos := true;
+      CheckTheGroup;
      end;
    end;
    Invalidate;

@@ -1,0 +1,160 @@
+object Form1: TForm1
+  Left = 433
+  Height = 333
+  Top = 250
+  Width = 373
+  Caption = 'Test GroupIndex'
+  ClientHeight = 333
+  ClientWidth = 373
+  object FlexiSwitch1: TFlexiSwitch
+    Left = 40
+    Height = 26
+    Top = 48
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 1
+    TabOrder = 0
+  end
+  object FlexiSwitch2: TFlexiSwitch
+    Left = 40
+    Height = 26
+    Top = 104
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 1
+    TabOrder = 1
+  end
+  object FlexiSwitch3: TFlexiSwitch
+    Left = 40
+    Height = 26
+    Top = 160
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 1
+    TabOrder = 2
+  end
+  object FlexiSwitch4: TFlexiSwitch
+    Left = 40
+    Height = 26
+    Top = 216
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 1
+    TabOrder = 3
+  end
+  object FlexiSwitch5: TFlexiSwitch
+    Left = 40
+    Height = 26
+    Top = 272
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 1
+    TabOrder = 4
+  end
+  object StaticText1: TStaticText
+    Left = 8
+    Height = 17
+    Top = 16
+    Width = 145
+    Caption = 'GroupIndex ungerade'
+    TabOrder = 5
+  end
+  object FlexiSwitch6: TFlexiSwitch
+    Left = 232
+    Height = 26
+    Top = 48
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 2
+    TabOrder = 6
+  end
+  object FlexiSwitch7: TFlexiSwitch
+    Left = 232
+    Height = 26
+    Top = 104
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 2
+    TabOrder = 7
+  end
+  object FlexiSwitch8: TFlexiSwitch
+    Left = 232
+    Height = 26
+    Top = 161
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 2
+    TabOrder = 8
+  end
+  object FlexiSwitch9: TFlexiSwitch
+    Left = 232
+    Height = 26
+    Top = 216
+    Width = 60
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 2
+    TabOrder = 9
+  end
+  object FlexiSwitch10: TFlexiSwitch
+    Left = 232
+    Height = 26
+    Top = 272
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    GroupIndex = 2
+    TabOrder = 10
+  end
+  object StaticText2: TStaticText
+    Left = 200
+    Height = 17
+    Top = 16
+    Width = 145
+    Caption = 'GroupIndex gerade'
+    TabOrder = 11
+  end
+end

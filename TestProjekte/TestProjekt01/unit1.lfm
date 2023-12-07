@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 800
   Top = 150
   Width = 789
-  Caption = 'Form1'
+  Caption = 'Test the flexiswitch'
   ClientHeight = 800
   ClientWidth = 789
   Color = clWhite
