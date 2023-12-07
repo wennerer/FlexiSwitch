@@ -116,17 +116,19 @@ begin
 end;
 
 procedure TPropertyImageSelector.RadioButtons(Sender: TObject);
+var i : integer;
 begin
  if FFirst then
   begin
    FFirst := false;
    exit;
   end;
-
+ i := FRollImage.ImageIndex;
  FRollImage.ImageIndex:= -1;
  if FRadioButton[0].Checked then FRollImage.aDirection:= fsLeft;
  if FRadioButton[1].Checked then FRollImage.aDirection:= fsRight;
  SetPtrValue(FRollImage);
+ FRollImage.ImageIndex := i;
 end;
 
 
