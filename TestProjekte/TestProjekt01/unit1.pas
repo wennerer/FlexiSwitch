@@ -24,6 +24,14 @@ type
     ColorBox5: TColorBox;
     ColorBox6: TColorBox;
     ColorBox7: TColorBox;
+    FlexiSwitch2: TFlexiSwitch;
+    FlexiSwitch3: TFlexiSwitch;
+    FlexiSwitch4: TFlexiSwitch;
+    FlexiSwitch5: TFlexiSwitch;
+    FlexiSwitch6: TFlexiSwitch;
+    FlexiSwitch7: TFlexiSwitch;
+    FlexiSwitch8: TFlexiSwitch;
+    Memo1: TMemo;
     SwitchMode: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;

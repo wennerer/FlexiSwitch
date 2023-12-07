@@ -242,6 +242,12 @@ end;
 procedure TFlexiSwitch.BoundsChanged;
 begin
   inherited BoundsChanged;
+   if (FDirection = fsRight) then
+  begin
+   CalculateBounds;
+   CalculateButton;
+   FRollPos := width - (FButtonSize + (2*FMargin));
+  end;
   Invalidate;
 end;
 

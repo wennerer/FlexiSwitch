@@ -529,7 +529,7 @@ object Form1: TForm1
     Height = 27
     Top = 520
     Width = 98
-    MaxValue = 30
+    MaxValue = 50
     MinValue = 4
     OnChange = SpinEdit4Change
     TabOrder = 47
@@ -560,5 +560,139 @@ object Form1: TForm1
     OnChange = SwitchModeChange
     TabOrder = 49
     Text = 'SwitchMode'
+  end
+  object FlexiSwitch2: TFlexiSwitch
+    Left = 128
+    Height = 26
+    Top = 24
+    Width = 60
+    Direction = fsRight
+    LeftCaption = 'Aus'
+    RightCaption = 'Ein'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    TabOrder = 50
+  end
+  object FlexiSwitch3: TFlexiSwitch
+    Left = 224
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = clMoneyGreen
+    RightBgrdColor = clSkyBlue
+    ButtonColor = clGreen
+    HoverColor = clSilver
+    LeftCaption = 'Ja'
+    RightCaption = 'Nein'
+    Font.Color = clPurple
+    Font.Height = 14
+    Font.Style = [fsBold]
+    TabOrder = 51
+  end
+  object FlexiSwitch4: TFlexiSwitch
+    Left = 320
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = clWhite
+    RightBgrdColor = clWhite
+    BorderColor = clBlack
+    FocusColor = clNone
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clSkyBlue
+    Font.Height = 13
+    Font.Style = [fsBold]
+    LeftImageIndex = 6
+    RightImageIndex = 6
+    TabOrder = 52
+  end
+  object FlexiSwitch5: TFlexiSwitch
+    Left = 408
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = clPurple
+    RightBgrdColor = clTeal
+    Direction = fsRight
+    Speed = 25
+    LeftCaption = 'OFF'
+    RightCaption = 'ON'
+    Font.Color = clWhite
+    Font.Height = 14
+    Font.Style = [fsBold]
+    LeftImageIndex = 5
+    RightImageIndex = 4
+    TabOrder = 53
+  end
+  object FlexiSwitch6: TFlexiSwitch
+    Left = 502
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = clOlive
+    RightBgrdColor = clNavy
+    Direction = fsRight
+    LeftCaption = 'O'
+    RightCaption = 'I'
+    Font.Color = clRed
+    Font.Height = 20
+    Font.Style = [fsBold]
+    BestTextHeight = False
+    LeftImageIndex = 3
+    RightImageIndex = 2
+    SwitchMode = fsSlide
+    TabOrder = 54
+  end
+  object FlexiSwitch7: TFlexiSwitch
+    Left = 600
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = 10545915
+    RightBgrdColor = 10545915
+    ButtonColor = clSkyBlue
+    BorderColor = clNavy
+    LeftCaption = 'Inactive'
+    RightCaption = 'Active'
+    Font.Color = clNavy
+    Font.Height = 8
+    Font.Style = [fsBold]
+    BestTextHeight = False
+    TabOrder = 55
+  end
+  object FlexiSwitch8: TFlexiSwitch
+    Left = 694
+    Height = 26
+    Top = 24
+    Width = 60
+    LeftBgrdColor = clWhite
+    RightBgrdColor = clWhite
+    ButtonColor = clBlack
+    BorderColor = clBlack
+    HoverColor = clCream
+    FocusColor = clNone
+    Direction = fsRight
+    LeftCaption = ' '
+    RightCaption = ' '
+    Font.Color = clWhite
+    Font.Height = 13
+    Font.Style = [fsBold]
+    TabOrder = 56
+  end
+  object Memo1: TMemo
+    Left = 32
+    Height = 114
+    Top = 662
+    Width = 730
+    Lines.Strings = (
+      'Zur Designzeit lassen sich Images mittel PropertyEditor auswählen. Dafür einfach im OI auf NewRollImage klicken.'
+      'Die von mir verwendeten Images sind von Roland Hahn (aka "ally"). VIELEN DANK!!!!'
+      'Siehe: https://www.lazarusforum.de/viewtopic.php?f=1&t=14263&p=128092&hilit=images+hahn#p128092.'
+      ''
+      'Falls jemand, der mehr Ahnung von Inkscape besitzt als ich, noch Images hinzufügen möchte, es sind noch genug Plätze im Editor frei.'
+    )
+    TabOrder = 57
   end
 end

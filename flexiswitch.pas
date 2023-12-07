@@ -197,6 +197,7 @@ type
    FSlideEndPos        : boolean;
    FFirst              : boolean;
    FFirstRight         : boolean;
+   FWidth: integer;
 
    procedure CheckTheGroup;
    procedure DrawAHoverEvent;
@@ -353,7 +354,6 @@ type
    //The Index within the group of FlexiSwitches, odd index allows only 1x fsRight, even 1x fsLeft
    //Der Index der Gruppe zu der der FlexiSwitch gehört, ungerader Index erlaubt nur 1x fsRight, gerade 1x fsLeft
    property GroupIndex : integer read FGroupIndex write SetGroupIndex default 0;
-
 
 
    property TabStop default TRUE;
