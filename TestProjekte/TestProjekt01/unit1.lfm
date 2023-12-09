@@ -237,7 +237,6 @@ object Form1: TForm1
     DefaultColorColor = clRed
     Selected = clRed
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
-    Color = clRed
     ItemHeight = 0
     OnChange = ColorBox4Change
     TabOrder = 20
@@ -508,7 +507,6 @@ object Form1: TForm1
     DefaultColorColor = clRed
     Selected = clWhite
     Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
-    Color = clRed
     ItemHeight = 0
     OnChange = ColorBox7Change
     TabOrder = 45
