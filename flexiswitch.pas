@@ -197,7 +197,7 @@ type
    FSlideEndPos        : boolean;
    FFirst              : boolean;
    FFirstRight         : boolean;
-   FWidth: integer;
+
 
    procedure CheckTheGroup;
    procedure DrawAHoverEvent;
