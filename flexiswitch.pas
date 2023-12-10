@@ -1,6 +1,6 @@
 { <TFlexiSwitch is a toggle component>
-  <Version 0.0.0.1>
-  Copyright (C) <07.12.2023> <Bernd Hübner>
+  <Version 0.0.0.3>
+  Copyright (C) <10.12.2023> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
   The images in the resource are from Roland Hahn. Vielen Dank!
@@ -197,8 +197,10 @@ type
    FSlideEndPos        : boolean;
    FFirst              : boolean;
    FFirstRight         : boolean;
+   FAbortSlide         : boolean;
 
 
+   function TheOnlyOne:boolean;
    procedure CheckTheGroup;
    procedure DrawAHoverEvent;
    procedure DrawFocused;
@@ -444,6 +446,7 @@ begin
   FFirst               := true;
   FFirstRight          := false;
   FGRoupIndex          :=   0;
+  FAbortSlide          := false;
 
   FTimer            := TTimer.Create(nil);
   FSpeed            := 10;
@@ -564,6 +567,8 @@ begin
      Cursor:=crHandPoint;
      if ssLeft in Shift then
       begin
+       if GroupIndex <> 0 then
+        if TheOnlyOne then exit;
        if FSlideFirst then
         FSlideStartX := x;
        FSlideFirst := false;
@@ -604,11 +609,19 @@ begin
 
  if FSwitchMode = fsSlide then
   if not FSlideEndPos and (FTimer.Enabled = false) then
-   FTimer.Enabled:= true;
+   begin
+    FAbortSlide := true;
+    FTimer.Enabled:= true;
+   end;
+
+
 
  if FSwitchMode = fsClick then
   if not FTimer.Enabled then
    begin
+    if GroupIndex <> 0 then
+     if TheOnlyOne then exit;
+
     FDirection := TDirection((ord(FDirection) + 1) mod 2);
     FTimer.Enabled:= true;
     if Assigned(OnChange) then OnChange(self);
@@ -662,6 +675,80 @@ begin
  Invalidate;
 end;
 
+function TFlexiSwitch.TheOnlyOne:boolean;
+var comp        : TComponent;
+    CurSwitch   : TFlexiSwitch;
+    CurForm     : TForm;
+    CurControl  : TControl;
+    lv          : integer;
+    exitflag    : boolean;
+    allthesame  : boolean;
+    first       : boolean;
+    aDirection  : TDirection;
+    count       : integer;
+begin
+ lv:=0; exitflag := false;
+ CurControl := Parent;
+ first := true;
+ count := 1;
+ repeat
+  if CurControl is TForm then exitflag := true
+   else
+    CurControl := CurControl.Parent;      //back to the Form
+  inc(lv);
+ until (lv =100) or (exitflag = true);
+ Result     := false;
+ allthesame := true;
+ CurForm := (CurControl as TForm);
+
+ for comp in CurForm do
+   begin
+    if comp is TFlexiSwitch then
+     begin
+      CurSwitch := comp as TFlexiSwitch;
+      if CurSwitch.GroupIndex <> 0 then
+       if (CurSwitch <> self) and (CurSwitch.GroupIndex = FGroupIndex) then
+        begin
+         inc(count);
+        end;
+     end;//comp is
+   end;//comp in
+ if count < 3 then exit;
+
+ for comp in CurForm do
+   begin
+    if comp is TFlexiSwitch then
+     begin
+      CurSwitch := comp as TFlexiSwitch;
+      if CurSwitch.GroupIndex <> 0 then
+       if (CurSwitch <> self) and (CurSwitch.GroupIndex = FGroupIndex) then
+        begin
+         if FDirection <> CurSwitch.Direction then allthesame :=false;
+
+        end;
+     end;//comp is
+   end;//comp in
+ if allthesame then exit;
+
+ Result := true;
+ for comp in CurForm do
+   begin
+    if comp is TFlexiSwitch then
+     begin
+      CurSwitch := comp as TFlexiSwitch;
+      if CurSwitch.GroupIndex <> 0 then
+       if (CurSwitch <> self) and (CurSwitch.GroupIndex = FGroupIndex) then
+        begin
+         if First then aDirection := CurSwitch.Direction;
+         First := false;
+         if aDirection <> CurSwitch.Direction then Result := false;
+
+        end;
+     end;//comp is
+   end;//comp in
+
+end;
+
 procedure TFlexiSwitch.CheckTheGroup;
 var comp        : TComponent;
     CurSwitch   : TFlexiSwitch;
@@ -669,6 +756,7 @@ var comp        : TComponent;
     CurControl  : TControl;
     lv          : integer;
     exitflag    : boolean;
+
 begin
  lv:=0; exitflag := false;
  CurControl := Parent;
@@ -688,11 +776,11 @@ begin
       if CurSwitch.GroupIndex <> 0 then
        if (CurSwitch <> self) and (CurSwitch.GroupIndex = FGroupIndex) then
         begin
-         if odd(CurSwitch.GroupIndex) then
-          CurSwitch.Direction:= fsLeft
-         else
-          CurSwitch.Direction:= fsRight;
-         CurSwitch.invalidate;
+         if CurSwitch.Direction = FDirection then
+          begin
+           CurSwitch.Direction := TDirection((ord(CurSwitch.Direction) + 1) mod 2);
+           CurSwitch.invalidate;
+          end;
         end;
      end;//comp is
    end;//comp in
@@ -771,6 +859,8 @@ begin
                       if not FEnabled then exit;
                        if not FTimer.Enabled then
                         begin
+                         if GroupIndex <> 0 then
+                          if TheOnlyOne then exit;
                          FDirection := TDirection((ord(FDirection) + 1) mod 2);
                          FTimer.Enabled:= true;
                          if Assigned(OnChange) then OnChange(self);
@@ -864,7 +954,9 @@ begin
       FCaption := FRightCaption;
       FAngel := 360;
       FSlideEndPos := true;
-      CheckTheGroup;
+      if not FAbortSlide then
+       CheckTheGroup;
+      FAbortSlide := false;
      end;
    end;
    if FDirection = fsLeft then
@@ -881,7 +973,9 @@ begin
       FCaption := FLeftCaption;
       FAngel := 0;
       FSlideEndPos := true;
-      CheckTheGroup;
+      if not FAbortSlide then
+       CheckTheGroup;
+      FAbortSlide := false;
      end;
    end;
    Invalidate;
@@ -1028,14 +1122,6 @@ begin
     TempImg3.SetSize(FButtonSize,FButtonSize);
     StretchDrawImgToImg(TempImg1,TempImg3,FButtonSize,FButtonSize);
     TmpBmp.Assign(TempImg3);
-    (*
-    if FFirst then
-     begin
-      if (FDirection = fsRight) and not FTimer.Enabled then
-       FRollPos := width - (FButtonSize + (2*FMargin));
-      FFirst := false;
-     end;
-     *)
 
     if FLoadFromFile and (FDirection = fsRight) and not FTimer.Enabled then
      FImgLeft := FImgLeft * -1 else FImgLeft := FImgTop;
