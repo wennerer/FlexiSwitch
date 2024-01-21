@@ -1,6 +1,6 @@
 { <TFlexiSwitch is a toggle component>
-  <Version 0.0.0.3>
-  Copyright (C) <10.12.2023> <Bernd Hübner>
+  <Version 0.0.1.0>
+  Copyright (C) <21.01.2024> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
   The images in the resource are from Roland Hahn. Vielen Dank!
@@ -40,7 +40,10 @@ interface
 uses
   Classes, SysUtils, Math, LResources, Forms, Controls, Graphics, Dialogs,
   IntfGraphics, LCLIntf, GraphType, PropEdits, outsourced, ExtCtrls, LMessages,
-  LCLType, StdCtrls, LCLProc;
+  LCLType, StdCtrls, LCLVersion, LCLProc;
+
+type
+  TDirection = (fsRight,fsLeft);
 
 type
   TClickEvent      = procedure(Sender: TObject) of object;
@@ -58,10 +61,10 @@ type
   TKeyPressEvent   = procedure(Sender: TObject; var Key: char) of Object;
 type
   TChangeEvent     = procedure(Sender: TObject) of object;
-
-
 type
-  TDirection = (fsRight,fsLeft);
+  TDirectionEvent  = procedure(Sender: TObject;aDirection : TDirection) of object;
+
+
 
 type
   TSwitchMode = (fsClick,fsSlide);
@@ -134,6 +137,9 @@ type
    FImgSizeFactor      : double;
    FGRoupIndex         : integer;
    FImgLeftImageIndex  : integer;
+   FOnDirection        : TDirectionEvent;
+   FOnLeft             : TChangeEvent;
+   FOnRight            : TChangeEvent;
    FRightImage         : TCustomBitmap;
    FImgLeftImage       : TCustomBitmap;
    FFocusColor         : TColor;
@@ -199,7 +205,6 @@ type
    FFirstRight         : boolean;
    FAbortSlide         : boolean;
 
-
    function TheOnlyOne:boolean;
    procedure CheckTheGroup;
    procedure DrawAHoverEvent;
@@ -247,13 +252,17 @@ type
    procedure KeyPress(var Key: char);override;
    procedure KeyDown(var Key: Word; Shift: TShiftState);  override;
    procedure KeyUp(var Key: Word; Shift: TShiftState);  override;
-   procedure CNKeyDown    (var Message: TLMKeyDown);    message CN_KEYDOWN;
+   procedure CNKeyDown(var Message: TLMKeyDown); message CN_KEYDOWN;
    procedure DoExit;  override;
    procedure DoEnter; override;
   public
    constructor Create(AOwner: TComponent); override;
    destructor  Destroy; override;
    procedure Loaded; override;
+   procedure ScaleFontsPPI(const AToPPI: Integer; const AProportion: Double);override;
+   {$IF LCL_FullVersion >= 2010000}
+   procedure FixDesignFontsPPI(const ADesignTimePPI: Integer); override;
+   {$IFEND}
    procedure MouseEnter; override;
    procedure MouseLeave; override;
    procedure MouseMove({%H-}Shift: TShiftState; X, Y: Integer);override;
@@ -353,8 +362,8 @@ type
    //The mode with which the switch is operated, click or slide
    //Der Modus mit dem der Schalter betätigt wird, klicken oder schieben
    property SwitchMode : TSwitchMode read FSwitchMode write FSwitchMode default fsClick;
-   //The Index within the group of FlexiSwitches, odd index allows only 1x fsRight, even 1x fsLeft
-   //Der Index der Gruppe zu der der FlexiSwitch gehört, ungerader Index erlaubt nur 1x fsRight, gerade 1x fsLeft
+   //The Index within the group of FlexiSwitches
+   //Der Index der Gruppe zu der der FlexiSwitch gehört
    property GroupIndex : integer read FGroupIndex write SetGroupIndex default 0;
 
 
@@ -385,6 +394,9 @@ type
    property OnKeyDown    : TKeyEvent read FOnKeyDown write FOnKeyDown;
    property OnKeyUp      : TKeyEvent read FOnKeyUp write FOnKeyUp;
    property OnChange     : TChangeEvent read FOnChange write FOnChange;
+   property OnRight      : TChangeEvent read FOnRight write FOnRight;
+   property OnLeft       : TChangeEvent read FOnLeft write FOnLeft;
+   property OnDirection  : TDirectionEvent read FOnDirection write FOnDirection;
    property OnDragDrop;
    property OnDragOver;
    property OnEndDrag;
@@ -469,28 +481,28 @@ begin
   FTextStyle.Clipping  := true;
 
   FBackgroundImage := TPortableNetworkGraphic.Create;
-  FBackgroundImage.LoadFromResourceName(HInstance,'backbround_180_78');
+  FBackgroundImage.LoadFromResourceName(HInstance,'backround');
   FButtonImage := TPortableNetworkGraphic.Create;
-  FButtonImage.LoadFromResourceName(HInstance,'button_72_72');
+  FButtonImage.LoadFromResourceName(HInstance,'puk001');
   FBorderImage := TPortableNetworkGraphic.Create;
-  FBorderImage.LoadFromResourceName(HInstance,'border');
+  FBorderImage.LoadFromResourceName(HInstance,'backroundborder');
 
   FImgLeftImageIndex  := 0;
   FRightImageIndex := 1;
   for lv := 0 to High(FImages) do
     FImages[lv] := TPortableNetworkGraphic.Create;
-  FImages[0].LoadFromResourceName(HInstance,'off');
-  FImages[1].LoadFromResourceName(HInstance,'ok');
-  FImages[2].LoadFromResourceName(HInstance,'ok_1');
-  FImages[3].LoadFromResourceName(HInstance,'delete_1');
-  FImages[4].LoadFromResourceName(HInstance,'add4');
-  FImages[5].LoadFromResourceName(HInstance,'remove1');
-  FImages[6].LoadFromResourceName(HInstance,'ball1');
-  FImages[7].LoadFromResourceName(HInstance,'ball2');
-  //load more images, maximal 40   Images must have 72x72pixel!
-  FImages[8].LoadFromResourceName(HInstance,'dummy');
+  FImages[0].LoadFromResourceName(HInstance, 'puk009');
+  FImages[1].LoadFromResourceName(HInstance, 'puk008');
+  FImages[2].LoadFromResourceName(HInstance, 'puk010');
+  FImages[3].LoadFromResourceName(HInstance, 'puk007');
+  FImages[4].LoadFromResourceName(HInstance, 'puk006');
+  FImages[5].LoadFromResourceName(HInstance, 'puk005');
+  FImages[6].LoadFromResourceName(HInstance, 'puk003');
+  FImages[7].LoadFromResourceName(HInstance, 'puk004');
+  //load more images, maximal 40   Images must have 64x64pixel!
+  FImages[8].LoadFromResourceName(HInstance, 'puk002');
   for lv := 9 to 39 do //load the rest with dummy
-   FImages[lv].Assign(FImages[8]);
+    FImages[lv].Assign(FImages[8]);
 
   FImgLeftImage := TPortableNetworkGraphic.Create;
   FImgLeftImage.Assign(FImages[FImgLeftImageIndex]);
@@ -794,10 +806,10 @@ begin
    Width  :=  10;
    Height :=   9;
   end;
- if width > 180 then
+ if (Width > 175) or (Height > 76) then
   begin
-   Width  := 180;
-   Height :=  78;
+   Width  := 175;
+   Height :=  76;
   end;
 
  if width <> FOldWidth then
@@ -906,6 +918,8 @@ begin
    Invalidate;
    CheckTheGroup;
    if Assigned(OnChange) then OnChange(self);
+   if Assigned(OnRight) then OnRight(self);
+   if Assigned(FOnDirection) then OnDirection(self,fsRight);
    exit;
   end;
 
@@ -920,6 +934,8 @@ begin
    Invalidate;
    CheckTheGroup;
    if Assigned(OnChange) then OnChange(self);
+   if Assigned(OnLeft) then OnLeft(self);
+   if Assigned(FOnDirection) then OnDirection(self,fsLeft);
    exit;
   end;
 
@@ -957,6 +973,8 @@ begin
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
+      if Assigned(OnRight) then OnRight(self);
+      if Assigned(FOnDirection) then OnDirection(self,fsRight);
      end;
    end;
    if FDirection = fsLeft then
@@ -976,10 +994,27 @@ begin
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
+      if Assigned(OnLeft) then OnLeft(self);
+      if Assigned(FOnDirection) then OnDirection(self,fsLeft);
      end;
    end;
    Invalidate;
  end;
+
+procedure TFlexiSwitch.ScaleFontsPPI(const AToPPI: Integer;
+  const AProportion: Double);
+begin
+ inherited;
+ DoScaleFontPPI(Font, AToPPI, AProportion);
+end;
+
+{$IF LCL_FullVersion >= 2010000}
+procedure TFlexiSwitch.FixDesignFontsPPI(const ADesignTimePPI: Integer);
+begin
+  inherited;
+  DoFixDesignFontPPI(Font, ADesignTimePPI);
+end;
+{$IFEND}
 
 function TFlexiSwitch.CalculateTextRect: TRect;
 begin

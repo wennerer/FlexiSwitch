@@ -14,9 +14,6 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
     ColorBox1: TColorBox;
     ColorBox2: TColorBox;
     ColorBox3: TColorBox;
@@ -24,6 +21,8 @@ type
     ColorBox5: TColorBox;
     ColorBox6: TColorBox;
     ColorBox7: TColorBox;
+    FlexiSwitch10: TFlexiSwitch;
+    FlexiSwitch11: TFlexiSwitch;
     FlexiSwitch2: TFlexiSwitch;
     FlexiSwitch3: TFlexiSwitch;
     FlexiSwitch4: TFlexiSwitch;
@@ -31,7 +30,9 @@ type
     FlexiSwitch6: TFlexiSwitch;
     FlexiSwitch7: TFlexiSwitch;
     FlexiSwitch8: TFlexiSwitch;
+    FlexiSwitch9: TFlexiSwitch;
     Memo1: TMemo;
+    StaticText24: TStaticText;
     SwitchMode: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
@@ -72,9 +73,6 @@ type
     StaticText9: TStaticText;
     TrackBar1: TTrackBar;
     procedure Button1Click(Sender: TObject);
-    procedure CheckBox1Change(Sender: TObject);
-    procedure CheckBox2Change(Sender: TObject);
-    procedure CheckBox3Change(Sender: TObject);
     procedure ColorBox1Change(Sender: TObject);
     procedure ColorBox2Change(Sender: TObject);
     procedure ColorBox3Change(Sender: TObject);
@@ -84,6 +82,10 @@ type
     procedure ColorBox7Change(Sender: TObject);
     procedure Edit1Change(Sender: TObject);
     procedure Edit2Change(Sender: TObject);
+    procedure FlexiSwitch10Left(Sender: TObject);
+    procedure FlexiSwitch10Right(Sender: TObject);
+    procedure FlexiSwitch11Change(Sender: TObject);
+    procedure FlexiSwitch9Direction(Sender: TObject; aDirection: TDirection);
     procedure FloatSpinEdit1Change(Sender: TObject);
     procedure FloatSpinEdit2Change(Sender: TObject);
     procedure FloatSpinEdit3Change(Sender: TObject);
@@ -115,31 +117,10 @@ begin
  aFlexiSwitch.Width:= TrackBar1.Position;
 end;
 
-procedure TForm1.CheckBox1Change(Sender: TObject);
-begin
-  if CheckBox1.Checked then aFlexiSwitch.Roll:= true else aFlexiSwitch.Roll:=false;
-end;
-
 procedure TForm1.Button1Click(Sender: TObject);
 begin
  aFlexiSwitch.LoadImagesfromFile('Lock_01_64.png','Lock_03_64.png');
  aFlexiSwitch.ImgSizeFactor:=0.7;
-end;
-
-procedure TForm1.CheckBox2Change(Sender: TObject);
-begin
- if aFlexiSwitch.BestTextHeight then
- begin
-  aFlexiSwitch.BestTextHeight := false;
-  aFlexiSwitch.Font.Height:= 12;
- end
- else aFlexiSwitch.BestTextHeight := true;
-end;
-
-procedure TForm1.CheckBox3Change(Sender: TObject);
-begin
-  if CheckBox3.Checked then aFlexiSwitch.Enabled:=true
-  else aFlexiSwitch.Enabled:=false;
 end;
 
 procedure TForm1.ColorBox1Change(Sender: TObject);
@@ -185,6 +166,33 @@ end;
 procedure TForm1.Edit2Change(Sender: TObject);
 begin
  aFlexiSwitch.RightCaption:=Edit2.Text;
+end;
+
+procedure TForm1.FlexiSwitch10Left(Sender: TObject);
+begin
+ aFlexiSwitch.BestTextHeight := False;
+ aFlexiSwitch.Font.Height := 12;
+end;
+
+procedure TForm1.FlexiSwitch10Right(Sender: TObject);
+begin
+ aFlexiSwitch.BestTextHeight := True;
+end;
+
+procedure TForm1.FlexiSwitch11Change(Sender: TObject);
+begin
+ if FlexiSwitch11.Direction = fsLeft then
+    aFlexiSwitch.Enabled := false
+  else
+    aFlexiSwitch.Enabled := true;
+end;
+
+procedure TForm1.FlexiSwitch9Direction(Sender: TObject; aDirection: TDirection);
+begin
+ if aDirection = fsRight then
+    aFlexiSwitch.Roll := True
+  else
+    aFlexiSwitch.Roll := False;
 end;
 
 procedure TForm1.FloatSpinEdit1Change(Sender: TObject);

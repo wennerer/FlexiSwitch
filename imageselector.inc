@@ -21,18 +21,18 @@ begin
     FImages[lv] := TPortableNetworkGraphic.Create;
 
 
-  FImages[0].LoadFromResourceName(HInstance,'off');
-  FImages[1].LoadFromResourceName(HInstance,'ok');
-  FImages[2].LoadFromResourceName(HInstance,'ok_1');
-  FImages[3].LoadFromResourceName(HInstance,'delete_1');
-  FImages[4].LoadFromResourceName(HInstance,'add4');
-  FImages[5].LoadFromResourceName(HInstance,'remove1');
-  FImages[6].LoadFromResourceName(HInstance,'ball1');
-  FImages[7].LoadFromResourceName(HInstance,'ball2');
-  //load more images, maximal 40  Images must have 72x72pixel!
-  FImages[8].LoadFromResourceName(HInstance,'dummy');
+  FImages[0].LoadFromResourceName(HInstance, 'puk009');
+  FImages[1].LoadFromResourceName(HInstance, 'puk008');
+  FImages[2].LoadFromResourceName(HInstance, 'puk010');
+  FImages[3].LoadFromResourceName(HInstance, 'puk007');
+  FImages[4].LoadFromResourceName(HInstance, 'puk006');
+  FImages[5].LoadFromResourceName(HInstance, 'puk005');
+  FImages[6].LoadFromResourceName(HInstance, 'puk003');
+  FImages[7].LoadFromResourceName(HInstance, 'puk004');
+  //load more images, maximal 40   Images must have 64x64pixel!
+  FImages[8].LoadFromResourceName(HInstance, 'puk002');
   for lv := 9 to 39 do //load the rest with dummy
-   FImages[lv].Assign(FImages[8]);
+    FImages[lv].Assign(FImages[8]);
 
   FRollImage            := TRollImage.Create;
   FRollImage.aDirection := TFlexiSwitch(GetComponent(0)).FDirection;
@@ -207,6 +207,6 @@ begin
   Canvas.Pen.Color   := FAColor;
   Canvas.Rectangle(0,0,Width,Height);
 
-  Canvas.Draw(1,1,FImage);
+  Canvas.Draw(5,5,FImage);
 end;
 

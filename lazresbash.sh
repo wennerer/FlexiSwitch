@@ -1,2 +1,2 @@
 #!/bin/bash
-lazres images.res images/backbround_180_78.png images/button_72_72.png images/border.png images/off.png images/ok.png images/ok_1.png images/delete_1.png images/add4.png images/remove1.png images/ball1.png images/ball2.png images/dummy.png
+lazres images.res images/backround.png images/backroundborder.png images/puk001.png images/puk002.png images/puk003.png images/puk004.png images/puk005.png images/puk006.png images/puk007.png images/puk008.png images/puk009.png images/puk010.png

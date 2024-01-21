@@ -20,7 +20,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="38"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="39"/>
         <CursorPos X="45" Y="64"/>
         <UsageCount Value="66"/>
         <Loaded Value="True"/>
@@ -29,9 +30,8 @@
       <Unit2>
         <Filename Value="../../flexiswitch.pas"/>
         <UnitName Value="FlexiSwitch"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="19" Y="2"/>
+        <CursorPos X="47" Y="23"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit2>
