@@ -64,21 +64,37 @@ procedure TFlexiSwitch.SetDirection(AValue: TDirection);
 begin
  if FDirection=AValue then Exit;
   FDirection:=AValue;
+  if Assigned(OnChange) then OnChange(self);
   if AValue = fsLeft then
    begin
-    FPortion := 0;
-    FAngel   := 0;
-    FRollPos := 0;
-    FCaption := FLeftCaption;
+     if FFirst then
+      begin
+       FPortion := 0;
+       FAngel   := 0;
+       FRollPos := 0;
+      end else
+      begin
+       FTimer.Enabled:= true;
+      end;
+     FCaption := FLeftCaption;
    end
    else
    begin
-    FPortion    := 1;
-    FAngel      :=  360;
-    FRollPos    := width - (FButtonSize + (2*FMargin));
+    if FFirst then
+     begin
+      CalculateBounds;
+      CalculateButton;
+      FPortion    := 1;
+      FAngel      :=  360;
+      FRollPos    := width - (FButtonSize + (2*FMargin));
+     end else
+     begin
+      FTimer.Enabled:= true;
+     end;
     FCaption    := FRightCaption;
     FFirstRight := true;
    end;
+  FFirst := false;
   Invalidate;
 end;
 

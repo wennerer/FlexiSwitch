@@ -1,6 +1,6 @@
 { <TFlexiSwitch is a toggle component>
   <Version 0.0.1.0>
-  Copyright (C) <21.01.2024> <Bernd Hübner>
+  Copyright (C) <10.04.2024> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
   The images in the resource are from Roland Hahn. Vielen Dank!
