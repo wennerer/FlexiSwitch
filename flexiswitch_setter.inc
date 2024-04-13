@@ -62,6 +62,7 @@ end;
 
 procedure TFlexiSwitch.SetDirection(AValue: TDirection);
 begin
+  (*
  if FDirection=AValue then Exit;
   FDirection:=AValue;
   if Assigned(OnChange) then OnChange(self);
@@ -72,21 +73,11 @@ begin
        FPortion := 0;
        FAngel   := 0;
        FRollPos := 0;
-       Checked  := false;
       end else
-      FTimer.Enabled:= true;
       begin
-       if (csDesigning in Componentstate) then
-        begin
-         FPortion := 0;
-         FAngel   := 0;
-         FRollPos := 0;
-         Checked  := false;
-        end else
-         FTimer.Enabled:= true;
+       FTimer.Enabled:= true;
       end;
      FCaption := FLeftCaption;
-     //FChecked  := false;
    end
    else
    begin
@@ -97,7 +88,61 @@ begin
       FPortion    := 1;
       FAngel      :=  360;
       FRollPos    := width - (FButtonSize + (2*FMargin));
-      Checked     := true;
+     end else
+     begin
+      FTimer.Enabled:= true;
+     end;
+    FCaption    := FRightCaption;
+    FFirstRight := true;
+   end;
+  FFirst := false;
+  //if not (csLoading in Componentstate) then FFirst := false;
+  Invalidate;
+ *)
+
+
+
+ if FDirection=AValue then Exit;
+  FDirection:=AValue;
+  if Assigned(OnChange) then OnChange(self);
+  if AValue = fsLeft then
+   begin
+     if FFirst and not (csDesigning in Componentstate) then
+      begin
+       //FPortion := 0;
+       //FAngel   := 0;
+       //FRollPos := 0;
+       //Checked  := false;
+       FTimer.Enabled:= true;
+      end else
+      FTimer.Enabled:= true;
+      begin
+       if (csDesigning in Componentstate) then
+        begin
+         FPortion := 0;
+         FAngel   := 0;
+         FRollPos := 0;
+         //Checked  := false;
+        end else
+         FTimer.Enabled:= true;
+      end;
+     FCaption := FLeftCaption;
+     //FChecked  := false;
+   end
+   else
+   begin
+    if FFirst and not (csDesigning in Componentstate) then
+     begin
+      CalculateBounds;
+      CalculateButton;
+      if not (csLoading in Componentstate) then FTimer.Enabled:= true
+      else
+       begin
+        FPortion    := 1;
+        FAngel      :=  360;
+        FRollPos    := width - (FButtonSize + (2*FMargin));
+      //Checked     := true;
+        end;
      end else
      begin
       if (csDesigning in Componentstate) then
@@ -105,7 +150,7 @@ begin
          FPortion    := 1;
          FAngel      :=  360;
          FRollPos    := width - (FButtonSize + (2*FMargin));
-         Checked     := true;
+         //Checked     := true;
         end else
       FTimer.Enabled:= true;
      end;
@@ -122,7 +167,7 @@ procedure TFlexiSwitch.SetChecked(AValue: boolean);
 begin
   if FChecked=AValue then Exit;
   FChecked:=AValue;
-  if aValue then SetDirection(fsRight) else SetDirection(fsLeft);
+ // if aValue then SetDirection(fsRight) else SetDirection(fsLeft);
 end;
 
 procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
