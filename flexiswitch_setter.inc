@@ -62,46 +62,6 @@ end;
 
 procedure TFlexiSwitch.SetDirection(AValue: TDirection);
 begin
-  (*
- if FDirection=AValue then Exit;
-  FDirection:=AValue;
-  if Assigned(OnChange) then OnChange(self);
-  if AValue = fsLeft then
-   begin
-     if FFirst then
-      begin
-       FPortion := 0;
-       FAngel   := 0;
-       FRollPos := 0;
-      end else
-      begin
-       FTimer.Enabled:= true;
-      end;
-     FCaption := FLeftCaption;
-   end
-   else
-   begin
-    if FFirst then
-     begin
-      CalculateBounds;
-      CalculateButton;
-      FPortion    := 1;
-      FAngel      :=  360;
-      FRollPos    := width - (FButtonSize + (2*FMargin));
-     end else
-     begin
-      FTimer.Enabled:= true;
-     end;
-    FCaption    := FRightCaption;
-    FFirstRight := true;
-   end;
-  FFirst := false;
-  //if not (csLoading in Componentstate) then FFirst := false;
-  Invalidate;
- *)
-
-
-
  if FDirection=AValue then Exit;
   FDirection:=AValue;
   if Assigned(OnChange) then OnChange(self);
@@ -109,10 +69,6 @@ begin
    begin
      if FFirst and not (csDesigning in Componentstate) then
       begin
-       //FPortion := 0;
-       //FAngel   := 0;
-       //FRollPos := 0;
-       //Checked  := false;
        FTimer.Enabled:= true;
       end else
       FTimer.Enabled:= true;
@@ -122,12 +78,10 @@ begin
          FPortion := 0;
          FAngel   := 0;
          FRollPos := 0;
-         //Checked  := false;
         end else
          FTimer.Enabled:= true;
       end;
      FCaption := FLeftCaption;
-     //FChecked  := false;
    end
    else
    begin
@@ -141,8 +95,7 @@ begin
         FPortion    := 1;
         FAngel      :=  360;
         FRollPos    := width - (FButtonSize + (2*FMargin));
-      //Checked     := true;
-        end;
+       end;
      end else
      begin
       if (csDesigning in Componentstate) then
@@ -150,13 +103,11 @@ begin
          FPortion    := 1;
          FAngel      :=  360;
          FRollPos    := width - (FButtonSize + (2*FMargin));
-         //Checked     := true;
         end else
       FTimer.Enabled:= true;
      end;
     FCaption    := FRightCaption;
     FFirstRight := true;
-    //FChecked     := true;
    end;
   if not (csLoading in Componentstate) then FFirst := false;
   Invalidate;

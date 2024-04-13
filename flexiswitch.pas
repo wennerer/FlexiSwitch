@@ -1,6 +1,6 @@
 { <TFlexiSwitch is a toggle component>
-  <Version 0.0.1.0>
-  Copyright (C) <10.04.2024> <Bernd Hübner>
+  <Version 0.0.1.2>
+  Copyright (C) <14.04.2024> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
   The images in the resource are from Roland Hahn. Vielen Dank!
@@ -296,7 +296,8 @@ type
    //To compensate if images with <>72px are loaded with LoadfromFile
    //Zum Ausgleich wenn mit LoadfromFile Images mit <>72px geladen werden
    property ImgSizeFactor : double read FImgSizeFactor write SetImgSizeFactor;
-
+   //Checked corresponds to the Direction Right, inserted for compatibility with radio buttons
+   //Checked entspricht der Direction Right, aus Kompatibilität zu Radiobuttons eingefügt
    property Checked : boolean read FChecked write SetChecked;
 
   published
@@ -640,7 +641,6 @@ begin
 
     FDirection := TDirection((ord(FDirection) + 1) mod 2);
     FTimer.Enabled:= true;
-    //if Assigned(OnChange) then OnChange(self);
    end;
 end;
 
@@ -983,7 +983,6 @@ begin
       if Assigned(OnRight) then OnRight(self);
       if Assigned(FOnDirection) then OnDirection(self,fsRight);
       if Assigned(OnChange) then OnChange(self);
-
      end;
    end;
    if FDirection = fsLeft then
@@ -1007,7 +1006,6 @@ begin
       if Assigned(OnLeft) then OnLeft(self);
       if Assigned(FOnDirection) then OnDirection(self,fsLeft);
       if Assigned(OnChange) then OnChange(self);
-
      end;
    end;
    Invalidate;
