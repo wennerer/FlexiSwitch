@@ -72,11 +72,21 @@ begin
        FPortion := 0;
        FAngel   := 0;
        FRollPos := 0;
+       Checked  := false;
       end else
+      FTimer.Enabled:= true;
       begin
-       FTimer.Enabled:= true;
+       if (csDesigning in Componentstate) then
+        begin
+         FPortion := 0;
+         FAngel   := 0;
+         FRollPos := 0;
+         Checked  := false;
+        end else
+         FTimer.Enabled:= true;
       end;
      FCaption := FLeftCaption;
+     //FChecked  := false;
    end
    else
    begin
@@ -87,15 +97,32 @@ begin
       FPortion    := 1;
       FAngel      :=  360;
       FRollPos    := width - (FButtonSize + (2*FMargin));
+      Checked     := true;
      end else
      begin
+      if (csDesigning in Componentstate) then
+        begin
+         FPortion    := 1;
+         FAngel      :=  360;
+         FRollPos    := width - (FButtonSize + (2*FMargin));
+         Checked     := true;
+        end else
       FTimer.Enabled:= true;
      end;
     FCaption    := FRightCaption;
     FFirstRight := true;
+    //FChecked     := true;
    end;
-  FFirst := false;
+  if not (csLoading in Componentstate) then FFirst := false;
   Invalidate;
+end;
+
+
+procedure TFlexiSwitch.SetChecked(AValue: boolean);
+begin
+  if FChecked=AValue then Exit;
+  FChecked:=AValue;
+  if aValue then SetDirection(fsRight) else SetDirection(fsLeft);
 end;
 
 procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
@@ -282,4 +309,6 @@ begin
   FBestTextHeight:=AValue;
   Invalidate;
 end;
+
+
 

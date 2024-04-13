@@ -133,6 +133,7 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
+    FChecked: boolean;
    FImages             : Array[0..39] of TCustomBitmap;
    FImgSizeFactor      : double;
    FGRoupIndex         : integer;
@@ -205,6 +206,7 @@ type
    FFirstRight         : boolean;
    FAbortSlide         : boolean;
 
+   procedure SetChecked(AValue: boolean);
    function TheOnlyOne:boolean;
    procedure CheckTheGroup;
    procedure DrawAHoverEvent;
@@ -365,6 +367,9 @@ type
    //The Index within the group of FlexiSwitches
    //Der Index der Gruppe zu der der FlexiSwitch gehört
    property GroupIndex : integer read FGroupIndex write SetGroupIndex default 0;
+
+
+   property Checked : boolean read FChecked write SetChecked default false;
 
 
    property TabStop default TRUE;
@@ -975,6 +980,7 @@ begin
       FAbortSlide := false;
       if Assigned(OnRight) then OnRight(self);
       if Assigned(FOnDirection) then OnDirection(self,fsRight);
+      FChecked := false;
      end;
    end;
    if FDirection = fsLeft then
@@ -996,6 +1002,7 @@ begin
       FAbortSlide := false;
       if Assigned(OnLeft) then OnLeft(self);
       if Assigned(FOnDirection) then OnDirection(self,fsLeft);
+      FChecked := true;
      end;
    end;
    Invalidate;
