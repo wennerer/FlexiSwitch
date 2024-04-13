@@ -133,7 +133,7 @@ type
 
   TFlexiSwitch = class(TCustomControl)
   private
-    FChecked: boolean;
+   FChecked            : boolean;
    FImages             : Array[0..39] of TCustomBitmap;
    FImgSizeFactor      : double;
    FGRoupIndex         : integer;
@@ -297,6 +297,8 @@ type
    //Zum Ausgleich wenn mit LoadfromFile Images mit <>72px geladen werden
    property ImgSizeFactor : double read FImgSizeFactor write SetImgSizeFactor;
 
+   property Checked : boolean read FChecked write SetChecked;
+
   published
    //The Left background colour
    //Die linke Hintergrundfarbe
@@ -367,9 +369,6 @@ type
    //The Index within the group of FlexiSwitches
    //Der Index der Gruppe zu der der FlexiSwitch gehört
    property GroupIndex : integer read FGroupIndex write SetGroupIndex default 0;
-
-
-   property Checked : boolean read FChecked write SetChecked default false;
 
 
    property TabStop default TRUE;
@@ -543,7 +542,7 @@ begin
    CalculateBounds;
    CalculateButton;
    FRollPos := width - (FButtonSize + (2*FMargin));
-
+   FChecked := true;
   end;
 end;
 
@@ -641,7 +640,7 @@ begin
 
     FDirection := TDirection((ord(FDirection) + 1) mod 2);
     FTimer.Enabled:= true;
-    if Assigned(OnChange) then OnChange(self);
+    //if Assigned(OnChange) then OnChange(self);
    end;
 end;
 
@@ -922,6 +921,7 @@ begin
    FSlideEndPos := true;
    Invalidate;
    CheckTheGroup;
+   FChecked := true;
    if Assigned(OnChange) then OnChange(self);
    if Assigned(OnRight) then OnRight(self);
    if Assigned(FOnDirection) then OnDirection(self,fsRight);
@@ -938,6 +938,7 @@ begin
    FSlideEndPos := true;
    Invalidate;
    CheckTheGroup;
+   FChecked := false;
    if Assigned(OnChange) then OnChange(self);
    if Assigned(OnLeft) then OnLeft(self);
    if Assigned(FOnDirection) then OnDirection(self,fsLeft);
@@ -978,9 +979,11 @@ begin
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
+      FChecked := true;
       if Assigned(OnRight) then OnRight(self);
       if Assigned(FOnDirection) then OnDirection(self,fsRight);
-      FChecked := false;
+      if Assigned(OnChange) then OnChange(self);
+
      end;
    end;
    if FDirection = fsLeft then
@@ -1000,9 +1003,11 @@ begin
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
+      FChecked := false;
       if Assigned(OnLeft) then OnLeft(self);
       if Assigned(FOnDirection) then OnDirection(self,fsLeft);
-      FChecked := true;
+      if Assigned(OnChange) then OnChange(self);
+
      end;
    end;
    Invalidate;

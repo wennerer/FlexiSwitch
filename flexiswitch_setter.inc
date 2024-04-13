@@ -167,7 +167,7 @@ procedure TFlexiSwitch.SetChecked(AValue: boolean);
 begin
   if FChecked=AValue then Exit;
   FChecked:=AValue;
- // if aValue then SetDirection(fsRight) else SetDirection(fsLeft);
+  if aValue then SetDirection(fsRight) else SetDirection(fsLeft);
 end;
 
 procedure TFlexiSwitch.SetDisabledColor(AValue: TColor);
