@@ -794,7 +794,26 @@ begin
         begin
          if CurSwitch.Direction = FDirection then
           begin
-           CurSwitch.Direction := TDirection((ord(CurSwitch.Direction) + 1) mod 2);
+           CurSwitch.FDirection := TDirection((ord(CurSwitch.Direction) + 1) mod 2);
+           CalculateBounds;
+           CalculateButton;
+           if CurSwitch.FDirection = fsLeft then
+            begin
+             FPortion := 0;
+             FAngel   := 0;
+             FRollPos := 0;
+             FCaption := FLeftCaption;
+            end
+           else
+            begin
+             FPortion    := 1;
+             FAngel      :=  360;
+             FRollPos    := width - (FButtonSize + (2*FMargin));
+             FCaption    := FRightCaption;
+            end;
+
+
+           //if CurSwitch.Direction = fsRight then CurSwitch.FChecked:=true else CurSwitch.FChecked:=false;
            CurSwitch.invalidate;
           end;
         end;
@@ -976,10 +995,11 @@ begin
       FCaption := FRightCaption;
       FAngel := 360;
       FSlideEndPos := true;
+      FChecked := true;
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
-      FChecked := true;
+
       if Assigned(OnRight) then OnRight(self);
       if Assigned(FOnDirection) then OnDirection(self,fsRight);
       if Assigned(OnChange) then OnChange(self);
@@ -999,10 +1019,11 @@ begin
       FCaption := FLeftCaption;
       FAngel := 0;
       FSlideEndPos := true;
+      FChecked := false;
       if not FAbortSlide then
        CheckTheGroup;
       FAbortSlide := false;
-      FChecked := false;
+
       if Assigned(OnLeft) then OnLeft(self);
       if Assigned(FOnDirection) then OnDirection(self,fsLeft);
       if Assigned(OnChange) then OnChange(self);
