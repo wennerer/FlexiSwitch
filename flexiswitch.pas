@@ -1,5 +1,5 @@
 { <TFlexiSwitch is a toggle component>
-  <Version 0.0.1.2>
+  <Version 0.0.1.5>
   Copyright (C) <14.04.2024> <Bernd Hübner>
   Many thanks to the members of the German Lazarus Forum!
   For some improvements see https://www.lazarusforum.de/viewtopic.php?p=137567#p137567
@@ -794,26 +794,23 @@ begin
         begin
          if CurSwitch.Direction = FDirection then
           begin
-           CurSwitch.FDirection := TDirection((ord(CurSwitch.Direction) + 1) mod 2);
-           CalculateBounds;
-           CalculateButton;
-           if CurSwitch.FDirection = fsLeft then
+           CurSwitch.FDirection := TDirection((ord(self.Direction) + 1) mod 2);
+           if CurSwitch.Direction = fsLeft then
             begin
-             FPortion := 0;
-             FAngel   := 0;
-             FRollPos := 0;
-             FCaption := FLeftCaption;
-            end
-           else
-            begin
-             FPortion    := 1;
-             FAngel      :=  360;
-             FRollPos    := width - (FButtonSize + (2*FMargin));
-             FCaption    := FRightCaption;
+             CurSwitch.FPortion := 0;
+             CurSwitch.FAngel   := 0;
+             CurSwitch.FRollPos := 0;
+             CurSwitch.FCaption := FLeftCaption;
+             CurSwitch.Checked  := false;
             end;
-
-
-           //if CurSwitch.Direction = fsRight then CurSwitch.FChecked:=true else CurSwitch.FChecked:=false;
+           if CurSwitch.Direction = fsRight then
+            begin
+             CurSwitch.FPortion    := 1;
+             CurSwitch.FAngel      :=  360;
+             CurSwitch.FRollPos    := width - (FButtonSize + (2*FMargin));
+             CurSwitch.FCaption    := FRightCaption;
+             CurSwitch.Checked     := true;
+            end;
            CurSwitch.invalidate;
           end;
         end;

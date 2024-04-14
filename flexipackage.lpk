@@ -12,7 +12,7 @@
     </CompilerOptions>
     <Description Value="A liite toogle switch component"/>
     <License Value="modified LGPL-2"/>
-    <Version Release="1" Build="2"/>
+    <Version Release="1" Build="5"/>
     <Files Count="4">
       <Item1>
         <Filename Value="flexiswitch.pas"/>

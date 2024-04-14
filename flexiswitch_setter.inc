@@ -67,21 +67,15 @@ begin
   if Assigned(OnChange) then OnChange(self);
   if AValue = fsLeft then
    begin
-     if FFirst and not (csDesigning in Componentstate) then
-      begin
-       FTimer.Enabled:= true;
-      end else
+    if (csDesigning in Componentstate) then
+     begin
+      FPortion := 0;
+      FAngel   := 0;
+      FRollPos := 0;
+     end
+    else
       FTimer.Enabled:= true;
-      begin
-       if (csDesigning in Componentstate) then
-        begin
-         FPortion := 0;
-         FAngel   := 0;
-         FRollPos := 0;
-        end else
-         FTimer.Enabled:= true;
-      end;
-     FCaption := FLeftCaption;
+    FCaption := FLeftCaption;
    end
    else
    begin
